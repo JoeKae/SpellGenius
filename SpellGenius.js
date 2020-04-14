@@ -11,7 +11,7 @@
  */
 
 const disable_sudden_check = true;
-const version = 'v0.8.pre-release';
+const version = 'v0.8.1.pre-release';
 chatWorkaround = function(message, who, spell=undefined)
 {
     if(spell !== undefined){
