@@ -2077,7 +2077,7 @@ wall_of_gloom = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
-    let duration    = '[[1d20 + [[ @{concentration} ]]+'+caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+']] rounds';
+    let duration    = 'Concentration, after Concentration is dropped: '+caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds';
     let effect      = 'Semiopaque **sheet** of darkness up to **'+(40*((meta_effect.widen_spell)? 2 : 1))+' ft long**,\n or a **ring** of darkness with a ' +
         'radius of up to **'+(15*((meta_effect.widen_spell)? 2 : 1))+' ft**.; either form **20 ft high**';
     let saving_throw= "Will negates; see text<br>(DC: [[@{spelldc2}+@{sf-illusion}]])";
