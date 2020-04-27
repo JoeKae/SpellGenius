@@ -11,7 +11,7 @@
  */
 
 const disable_sudden_check = true;
-const version = 'v0.8.1.pre-release';
+const version = 'v0.8.2.pre-release';
 chatWorkaround = function(message, who, spell=undefined)
 {
     if(spell !== undefined){
@@ -127,6 +127,7 @@ spell_gen = function(msg_orig) {
                 macro += "\n/w gm "+spell.gm_command;
             }
             msg_orig.content = '!spell_genius '+arr[1];
+            msg_orig.selected = [get_token(caster_id)];
             spell_genius(msg_orig);
             if(disable_sudden_check && !spell.sudden_check(meta_effect)){
                 sendMessage('/w \"'+who+'\" **Meta Feats not Available:**'+spell.sudden_problem(meta_effect), msg_orig.who);
@@ -525,6 +526,7 @@ gen_macro = function(spell){
 };
 
 
+
 //meta feats
 const meta_feats = {
     'widen_spell'   : {
@@ -777,7 +779,7 @@ read_magic = function(caster_id, target_id, meta_effect, metas, info=null) {
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
     let school      = "Div";
-    let level       = "Brd 0, Clr 0, Drd 0, Pal 1, Rgr 1, Sor/Wiz 0";
+    let level       = "Sor/Wiz 0";//"Brd 0, Clr 0, Drd 0, Pal 1, Rgr 1, Sor/Wiz 0";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
@@ -791,10 +793,399 @@ read_magic = function(caster_id, target_id, meta_effect, metas, info=null) {
     let saving_throw= "None";
     let spell_resist= "No";
     let ranged_touch= undefined;
-    let notes       = "You can decipher magical inscriptions that would otherwise be unintelligible.                                                    \
-                       This does not normally invoke the magic contained in the writing, although it may do so in the case of a cursed scroll.          \
-                       You can read at the rate of one page (250 words) per minute. Identify a glyph of warding with a DC 13 Spellcraft check,          \
-                       a greater glyph of warding with a DC 16 Spellcraft check, or any symbol spell with a Spellcraft check (DC 10 + spell level).";
+    let notes       = "You can decipher magical inscriptions that would otherwise be unintelligible, 250 words per minute, a glyph or warding.";
+    let fx          = undefined;
+    let gm_command  =  undefined;
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+endure_elements = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Endure Elements";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/endure-elements--2317/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: undefined
+        };
+    }
+    let compatible_feats = [
+        'extend_spell', 'sudden_extend',
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
+    let school      = "Abjuration";
+    let level       = "Sor/Wiz 1";//"Cleric 1, Savant 1 (Divine), Sha'ir 1, Wu Jen 1 (All), Blighter 1, Knight of the Chalice 1, " +
+    //"Vassal of Bahamut 1, Runescarred Berserker 1, Adept 1, Wizard 1, Sorcerer 1, Ranger 1, Paladin 1, Druid 1, " +
+        //"Urban Druid 1, Sun 1, Ocean 1, Arborea 1, Endurance 1";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S';
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Touch";
+    let duration    = 24*((meta_effect.extend_spell)? 2 : 1)+' hours';
+    let effect      = undefined;
+    let saving_throw= "Will negates";
+    let spell_resist= "Yes";
+    let ranged_touch= undefined;
+    let notes       = "A creature protected by endure elements **suffers no harm from being in a hot or cold environment**. " +
+        "It can exist** comfortably in conditions between -50 and 140 °F / -45 and 60 °C without having to make Fortitude saves** " +
+        "(as described in the Dungeon Master's Guide). The creature's **equipment is likewise protected**. Endure elements " +
+        "**doesn't provide any protection from fire or cold damage**, nor does it protect against other environmental " +
+        "hazards such as smoke, lack of air, and so forth.";
+    let fx          = undefined;
+    let gm_command  =  undefined;
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+vigilant_slumber = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Vigilant Slumber";
+    let url         = "https://dndtools.net/spells/complete-mage--58/vigilant-slumber--806/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: undefined
+        };
+    }
+    let compatible_feats = [
+        'extend_spell', 'sudden_extend',
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
+    let school      = "Divination";
+    let level       = "Sor/Wiz 1";//"Assassin 1, Bard 1, Sorcerer 1, Wizard 1";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S';
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Personal";
+    let duration    = 12*((meta_effect.extend_spell)? 2 : 1)+' hours or until awakened';
+    let effect      = undefined;
+    let saving_throw= "No";
+    let spell_resist= "No";
+    let ranged_touch= undefined;
+    let notes       = "Even as you prepare for sleep, you feel a strange alertness in the back of your mind. " +
+        "You set a **specific condition under which you automatically wake up**. This condition might be anything " +
+        "from 'If any Tiny or larger creature comes within 10 feet of me' to 'When the moon is at its zenith'. " +
+        "The **condition must be something that you would normally be able to observe if you were awake**. Thus, " +
+        "you can't set the spell to wake you when something happens elsewhere, or when an invisible foe " +
+        "sneaks into your campsite. You awaken fully alert and ready for action.";
+    let fx          = undefined;
+    let gm_command  =  undefined;
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+comprehend_languages = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Comprehend Languages";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/comprehend-languages--2482/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: 'A pinch of soot and a few grains of salt.',
+            f: undefined
+        };
+    }
+    let compatible_feats = [
+        'extend_spell', 'sudden_extend',
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
+    let school      = "Div";
+    let level       = "Sor/Wiz 1";//"Bard 1, Urban Druid 1, Death Master 1, Savant 1 (Arcane, Divine), " +
+        //"Sha'ir 1, Wu Jen 1, Beguiler 1, Vigilante 1, Knight of the Weave 1, Ebonmar Infiltrator 1, " +
+        //"Adept 1, Wizard 1, Sorcerer 1, Cleric 1, Court Herald 1, Mind 1, Herald 1,";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    comp   += "M";
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Personal";
+    let duration    = 10*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let effect      = undefined;
+    let saving_throw= "None";
+    let spell_resist= "No";
+    let ranged_touch= undefined;
+    let notes       = "You can understand the spoken words of creatures or read otherwise incomprehensible written messages. " +
+        "In either case, **you must touch the creature or the writing**. The spell enables you to **understand or read an unknown language, not " +
+        "speak or write it**. Magical writing cannot be read, though the spell reveals that it is magical. This spell **can be foiled** by " +
+        "certain **warding magic** (such as the **secret page** and **illusory script** spells). " +
+        "It does not decipher codes or reveal messages concealed in otherwise normal text.";
+    let fx          = undefined;
+    let gm_command  =  undefined;
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+protection_from_evil = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Protection from Evil";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/protection-from-evil--2348/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: 'A little powdered silver with which you trace a 3-foot -diameter circle on the floor (or ground) around the creature to be warded.',
+            f: undefined
+        };
+    }
+
+    let compatible_feats = [
+        'extend_spell', 'sudden_extend',
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
+    let school      = "Abjuration [Good]";
+    let level       = "Sor/Wiz 1";//;"Cleric 1, Savant 1 (Divine), Sha'ir 1, Divine Bard 1, " +
+        //"Knight of the Chalice 1, Vassal of Bahamut 1, Runescarred Berserker 1, Healer 1, " +
+        //"Adept 1, Wizard 1, Sorcerer 1, Paladin 1, Demonologist 1, Good 1, Elysium 1";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    comp   += "M";
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Touch";
+    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+" minutes";
+    let effect      = "magical barrier around the subject at a distance of 1 foot";
+    let saving_throw= "Will negates (harmless)";
+    let spell_resist= "No (see text)";
+    let ranged_touch= undefined;
+    let notes       = "**Wards** a creature **from attacks by evil creatures, from mental control, and from " +
+        "summoned creatures**. It creates a **magical barrier** around the subject at a **distance of 1 foot**. The " +
+        "barrier moves with the subject and has three major effects. <br>**1. +2 deflection AC**, **+2 resistance on saves**. Both apply against " +
+        "attacks/effects by evil creatures. <br>**2.** (works **regardless of alignment**), the barrier **blocks any attempt to possess the " +
+        "warded creature** or to exercise mental control " +
+        "(including charm/compulsion effects that grant the caster ongoing " +
+        "control). The barrier keeps out a possessing life force but does not expel one. " +
+        " <br>**3.**, the spell **prevents bodily contact by " +
+        "summoned creatures**. This causes their **natural weapon attacks to fail** and the creatures " +
+        "to **recoil if such attacks require touching**. " +
+        "The **protection** against contact by summoned creatures **ends if the warded creature makes an attack against**" +
+        " or tries to force the barrier against **the blocked creature**. **Spell resistance can allow** a creature to " +
+        "**overcome this protection** and touch the warded creature.";
+    let fx          =  {
+        'from_x'    : target.token.get('left'),
+        'from_y'    : target.token.get('top'),
+        'effect'    : 'burn-holy',
+        'to_x'      : undefined,
+        'to_y'      : undefined,
+        'custom'    : undefined,
+        'line'      : false
+    };
+    let gm_command  =  '[Set Aura](!token-mod --ignore-selected --set aura2_radius|1 aura2_square|false  --ids '+target_id+' ) ' +
+        '<br>[Remove Aura](!token-mod --ignore-selected --set aura2_radius| --ids '+target_id+')';
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+feather_fall = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Feather Fall";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/feather-fall--2813/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: undefined
+        };
+    }
+    let compatible_feats = [
+        'enlarge_spell', 'sudden_enlarge',
+        'extend_spell', 'sudden_extend',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
+    let school      = "Transmutation";
+    let level       = "Sor/Wiz 1";//"Bard 1, Sorcerer 1, Wizard 1, Vigilante 1, Jester 1, Savant 1 (Arcane), Sha'ir 1, Assassin 1, Court Herald 1";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V';
+
+    let cast_time   = "free action";
+    let range       = "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*(Math.floor(caster.casterlevel/2))) +"ft";
+    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds or until landing';
+    let effect      = "Cast Feather Fall on **"+caster.casterlevel+"** Medium freefalling objects/creatures, no two of which may be >20 ft. apart";
+    let saving_throw= "Will negates";
+    let spell_resist= "Yes (object)";
+    let ranged_touch= undefined;
+    let notes       = "The affected creatures or objects **fall slowly**, though faster than feathers typically do. " +
+        "Feather fall **instantly changes the rate at which the targets fall to** a mere **60 feet per round** (equivalent " +
+        "to the end of a fall from a few feet), and the subjects **take no damage upon landing** while the spell is in " +
+        "effect. However, when the **spell duration expires, a normal rate of falling resumes**. The spell **affects " +
+        "one or more Medium or smaller creatures** (including gear and carried objects **up to each creature's " +
+        "maximum load**) **or objects**, **or the equivalent in larger creatures**. You can cast this spell with an instant " +
+        "utterance, quickly enough to save yourself " +
+        "if you unexpectedly fall. Casting the spell is a free action, like casting a quickened spell. " +
+        "**You may even cast this spell when it isn't " +
+        "your turn**.";
+    let fx          = undefined;
+    let gm_command  =  undefined;
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+persistent_blade = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Persistent Blade";
+    let url         = "https://dndtools.net/spells/spell-compendium--86/persistent-blade--4623/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: "A silvered dagger."
+        };
+    }
+    let compatible_feats = [
+        'maximize_spell', 'sudden_maximize',
+        'empower_spell', 'maximize_spell',
+        'enlarge_spell', 'sudden_enlarge',
+        'extend_spell', 'sudden_extend',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
+    let school      = "Evocation [Force]";
+    let level       = "Sor/Wiz 1";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    comp   += "F";
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*(Math.floor(caster.casterlevel/2))) +"ft";
+    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds';
+    let effect      = "One dagger made of force";
+    let saving_throw= "No";
+    let spell_resist= "Yes";
+    let ranged_touch= undefined;
+    let checkroll   = '';
+    if(meta_effect.maximize_spell && meta_effect.empower_spell){ //maximize and empower
+        checkroll += '6';
+    }else if(meta_effect.maximize_spell){ //maximize but no empower
+        checkroll += '4';
+    }else if(meta_effect.empower_spell){ //empower but no maximize
+        checkroll += '1d4 x 1.5';
+    }else{  //no maximze and no empower
+        checkroll += '1d4';
+    }
+    let sor = (parseInt(caster.get_attr('bab'))+Math.floor(parseInt(caster.get_attr('cha-mod'))/2));
+    let wiz = (parseInt(caster.get_attr('bab'))+Math.floor(parseInt(caster.get_attr('int-mod'))/2));
+    let notes       = "AB: (Sor: **+"+sor +"**),  (Wiz: **+"+wiz+"**) <br> DMG: **"+checkroll+" (19-20x2)**<br>"+
+        "You bring into being a tiny blade of force which flies at a speed of 40 feet" +
+        "and attacks any target within its range, starting in the round when you cast the spell. " +
+        "It attacks on your turn once each round. If an **ally also attacks** the creature, " +
+        "the blade moves on your turn to **flank the target**. As a force effect, it **can strike ethereal and " +
+        "incorporeal creatures**. The **blade cannot be attacked**. Each round after the first, you can use a standard " +
+        "action to **switch** to a new **target**; otherwise, it has same target. " +
+        "If an attacked creature **has spell resistance**, the **resistance is checked the first time the blade strikes**. " +
+        "If **successfully resisted**, the **spell is dispelled**. **If not**, the blade has its **normal " +
+        "for the duration of the spell**.";
     let fx          = undefined;
     let gm_command  =  undefined;
 
@@ -939,10 +1330,10 @@ dimension_door = function(caster_id, target_id, meta_effect, metas, info=null) {
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+")";
     let school      = "Con (Teleportation)";
-    let level       = " Trapsmith 2, Telflammar Shadowlord 3, Bard 4, Savant 4 (Arcane), " +
-        "Jester 4, Death Master 4, Sha'ir 4, Wu Jen 4 (Earth), Duskblade 4, Court Herald 4, " +
-        "Slayer of Domiel 4, Ebonmar Infiltrator 4, Hoardstealer 4, Wizard 4, Sorcerer 4, " +
-        "Runescarred Berserker 5, Knight of the Weave 5, Travel 4, Portal (Alternative) 4, Portal 4";
+    let level       = "Sor/Wiz 4";//" Trapsmith 2, Telflammar Shadowlord 3, Bard 4, Savant 4 (Arcane), " +
+        //"Jester 4, Death Master 4, Sha'ir 4, Wu Jen 4 (Earth), Duskblade 4, Court Herald 4, " +
+        //"Slayer of Domiel 4, Ebonmar Infiltrator 4, Hoardstealer 4, Wizard 4, Sorcerer 4, " +
+        //"Runescarred Berserker 5, Knight of the Weave 5, Travel 4, Portal (Alternative) 4, Portal 4";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V';
@@ -1130,22 +1521,23 @@ defenestrating_sphere = function(caster_id, target_id, meta_effect, metas, info=
     }
 
 
-    let notes  = "A cloudy gray sphere of whirling air and howling wind flies to attack your enemies and hurl them to " +
+    let notes  = "A sphere of whirling air flies to attack your enemies and hurl them to " +
         "the sky. As a move action, you can make the sphere **travel up to 30 feet per round** and strike the creature or " +
-        "object you indicate as a **ranged touch attack**. Any creature **struck** by the sphere takes **"+checkroll1+"** points of damage " +
-        "from the force of its winds. In addition, **Medium or smaller** creatures must succeed on a **Fortitude save** or " +
-        "be knocked prone. Creatures that fall prone must then succeed on a **second Fortitude save** or be swept up by " +
-        "the sphere and driven **"+checkroll2+"** feet into the air, dropping **1d6 squares** from their original position in a **random** " +
+        "object you indicate as a **ranged touch attack**. Any creature **struck** by the sphere takes **"+checkroll1+"** points of damage. " +
+        "In addition, **Medium or smaller** creatures must succeed on a **Fortitude save** or " +
+        "be knocked prone. Creatures that fall prone must succeed on a **second Fortitude save** or be swept up  " +
+        "**"+checkroll2+"** feet into the air, dropping **1d6 squares** from their original position in a **random** " +
         "direction and taking falling damage as normal. If some **obstacle** prevents the target creature from reaching " +
-        "its expelled height, it takes **1d6** points of damage for every **10 feet** of movement it was unable to complete, " +
-        "so that a creature hurled 50 feet up in a room with a 20-foot ceiling would take 3d6 points of damage from the " +
-        "impact, then take 2d6 points of damage when it falls back to the ground. The sphere can affect a maximum of " +
+        "its expelled height, it takes **1d6** points of damage for every **10 feet** of movement it was unable to complete(" +
+        "a creature hurled 50 ft up in a room with a 20 ft ceiling takes 3d6 damage from the " +
+        "impact and 2d6 points of damage when it falls back to the ground. The sphere can affect " +
         "one creature or object per round, and winks out if it exceeds the spell's range.";
 
     let fx_speed    =undefined;
     let fx_duration = undefined;
     let fx          =  undefined;
-    let gm_command  =  '[Roll struck damage](!&#13;/w gm [[floor('+checkroll1+'&#41;&#93;&#93; struck damage (air&#41;) ' +
+    let gm_command  =  '[Roll ranged touch check](!&#13;/w gm [[1d20 + '+caster.get_attr('bab')+'+'+caster.get_attr('dex-mod')+'&#93;&#93;) ' +
+        '[Roll struck damage](!&#13;/w gm [[floor('+checkroll1+'&#41;&#93;&#93; struck damage (air&#41;) ' +
         '[Roll height](!&#13;/w gm [[floor('+checkroll2+'&#41;&#93;&#93; ft (fall damage: 1d6 per 10 ft&#41;) ' +
         '[Fall damage](!&#13;/w gm [[[[floor(&#63;{Height in ft}/10&#41;&#93;&#93;d6&#93;&#93; fall damage)';
 
@@ -1185,8 +1577,8 @@ arcane_sight = function(caster_id, target_id, meta_effect, metas, info=null) {
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
     let school      = "Div";
-    let level       = "Trapsmith 1, Sorcerer 3, Sha'ir 3, Savant 3 (Arcane), Death Master 3, Beguiler 3, " +
-        "Knight of the Weave 3, Ebonmar Infiltrator 3, Hoardstealer 3, Wizard 3, Court Herald 3";
+    let level       = "Sor/Wiz 3";//"Trapsmith 1, Sorcerer 3, Sha'ir 3, Savant 3 (Arcane), Death Master 3, Beguiler 3, " +
+        //"Knight of the Weave 3, Ebonmar Infiltrator 3, Hoardstealer 3, Wizard 3, Court Herald 3";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
@@ -1199,13 +1591,14 @@ arcane_sight = function(caster_id, target_id, meta_effect, metas, info=null) {
     let saving_throw= "None";
     let spell_resist= "No";
     let ranged_touch= undefined;
-    let notes       = "This spell makes your eyes glow blue and allows you to **see magical auras** within **120 feet** of you.\n" +
-        "The effect is similar to that of a detect magic spell, but arcane sight does not require concentration and discerns aura location and power more quickly.\n" +
-        "You know the **location and power of all magical auras** within your sight.\n" +
-        "If the items or creatures bearing the auras are in line of sight, you can make Spellcraft skill checks to determine the school of magic involved in each.\n" +
-        "(Make one check per aura; DC 15 + spell level, or 15 + one-half caster level for a nonspell effect).\n" +
-        "If you **concentrate on** a specific **creature within 120 feet** of you as a **standard action**, you can determine whether it has any spellcasting or spell-like abilities, whether these are arcane or divine (spell-like abilities register as arcane), and the strength of the most powerful spell or spell-like ability the creature currently has available for use.\n" +
-        "In some cases, arcane sight may give a deceptively low reading—for example, when you use it on a spellcaster who has used up most of his or her daily spell allotment.";
+    let notes       = "This spell makes your eyes glow blue and allows you to **see magical auras** within **120 feet** of you." +
+        "The effect is similar to that of a detect magic spell, but arcane sight does not require concentration and discerns aura location and power more quickly." +
+        "You know the **location and power of all magical auras** within your sight." +
+        "If the auras are in line of sight, you can make Spellcraft skill checks to determine the school of magic involved in each." +
+        "(one check per aura; DC 15 + spell level, or 15 + one-half caster level for nonspell effects)." +
+        "If you **concentrate on** a specific **creature within 120 feet** of you as a **standard action**, you can determine whether it has any spellcasting " +
+        "or spell-like abilities, whether these are arcane or divine, the strength of the most powerful the creature currently has available for use." +
+        "It may give a deceptively low reading. For example, when you use it on a spellcaster who has used up most of his or her daily spell allotment.";
     let fx          = undefined;
     let gm_command  =  undefined;
 
@@ -1247,9 +1640,9 @@ dispel_magic = function(caster_id, target_id, meta_effect, metas, info=null) {
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+")";
     let school      = "Abj";
-    let level       = "Trapsmith 1, Bard 3, Death Master 3, Sha'ir 3, Wu Jen 3, Blighter 3, Beguiler 3, " +
-        "Vigilante 3, Knight of the Chalice 3, Knight of the Weave 3, Cleric 3, Paladin 3, Sorcerer 3, Wizard 3, " +
-        "Hoardstealer 3, Court Herald 3, Duskblade 4, Druid 4, Urban Druid 4, Dread Necromancer 4, Magic 3";
+    let level       = "Sor/Wiz 3";//"Trapsmith 1, Bard 3, Death Master 3, Sha'ir 3, Wu Jen 3, Blighter 3, Beguiler 3, " +
+        //"Vigilante 3, Knight of the Chalice 3, Knight of the Weave 3, Cleric 3, Paladin 3, Sorcerer 3, Wizard 3, " +
+        //"Hoardstealer 3, Court Herald 3, Duskblade 4, Druid 4, Urban Druid 4, Dread Necromancer 4, Magic 3";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
@@ -1262,16 +1655,15 @@ dispel_magic = function(caster_id, target_id, meta_effect, metas, info=null) {
     let saving_throw= "None";
     let spell_resist= "No";
     let ranged_touch= undefined;
-    let notes       = "**Targeted Dispel:** One object, creature, or spell is the target of the dispel magic spell. " +
-        "You make a dispel check (1d20 + your caster level, maximum +10) against the spell or against each ongoing " +
-        "spell currently in effect on the object or creature. The DC for this dispel check is 11 + the spell's caster " +
-        "level. \n**Area Dispel:** When dispel magic is used in this way, the spell affects everything within a "+20*((meta_effect.widen_spell)? 2 : 1)+"-foot radius.\n" +
-        "For each creature within the area that is the subject of one or more spells, you make a dispel check against " +
-        "the spell with the highest caster level. If that check fails, you make dispel checks against progressively " +
-        "weaker spells until you dispel one spell (which discharges the dispel magic spell so far as that target is " +
-        "concerned) or until you fail all your checks. The creature's magic items are not affected.\n" +
-        "For each object within the area that is the target of one or more spells, you make dispel checks as with " +
-        "creatures. Magic items are not affected by an area dispel. \n**Counterspell:** When dispel magic is used in this " +
+    let notes       = "**Targeted Dispel:** One object, creature, or spell is the target of the spell. " +
+        "Dispel check (1d20 + your caster level) against the spell or against each ongoing " +
+        "spell currently in effect on the target. The DC is 11 + the spell's caster " +
+        "level. <br>**Area Dispel:** When used this way, the spell affects everything within a "+20*((meta_effect.widen_spell)? 2 : 1)+" ft radius." +
+        "For each creature within, that is the subject of one or more spells, you make a dispel check against " +
+        "the spell with the highest caster level. If that check fails, you make checks against progressively " +
+        "weaker spells until you dispel one spell or until you fail all your checks." +
+        "For each object in the area that is the target of one or more spells, you make checks as with " +
+        "creatures. Magic items are not affected by an area dispel. <br>**Counterspell:** When used in this " +
         "way, the spell targets a spellcaster and is cast as a counterspell. Unlike a true counterspell, " +
         "however, dispel magic may not work; you must make a dispel check to counter the other spellcaster's spell.";
     let fx          = undefined;
@@ -1322,7 +1714,7 @@ fireball = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let spell_tag   = "casts ["+spellname+"]("+url+")";
     let school      = "Evocation (fire)";
-    let level       = " Sor/Wiz 3, Warmage 3, Wu Jen 3 (Fire), Sha'ir 3, Shugenja 4 (Agasha School)";
+    let level       = "Sor/Wiz 3";//"Sor/Wiz 3, Warmage 3, Wu Jen 3 (Fire), Sha'ir 3, Shugenja 4 (Agasha School)";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
@@ -1347,17 +1739,13 @@ fireball = function(caster_id, target_id, meta_effect, metas, info=null) {
     }
 
 
-    let notes  = "A fireball spell is an explosion of flame that detonates with a low roar and deals **"+checkroll+
+    let notes  = "A fireball is an explosion of flame that deals **"+checkroll+
         "** points of fire damage to every creature within the area. Unattended objects also take this damage. " +
         "The explosion creates almost no pressure. A glowing, pea-sized bead streaks from the pointing finger and, " +
         "unless it impacts upon a material body or solid barrier prior to attaining the prescribed range, " +
         "blossoms into the fireball at that point. (An early impact results in an early detonation). If you attempt to " +
         "send the bead through a **narrow passage**, such as through an arrow slit, you must *hit* the opening with a " +
-        "**ranged touch attack**, or else the bead strikes the barrier and detonates prematurely. The fireball sets fire " +
-        "to combustibles and damages objects in the area. It can melt metals with low melting points, such as " +
-        "lead, gold, copper, silver, and bronze. If the damage caused to an interposing barrier shatters or " +
-        "breaks through it, the fireball may continue beyond the barrier if the area permits; otherwise it stops at " +
-        "the barrier just as any other spell effect does.";
+        "**ranged touch attack**.";
 
     //let fx_speed    = 20;
     //let fx_duration = Math.round(calc_distance({ x : caster.token.get('left'), y : caster.token.get('top')},
@@ -1526,8 +1914,8 @@ haste = function(caster_id, target_id, meta_effect, metas, info=null) {
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
     let school      = "Transmutation";
-    let level       = "Trapsmith 1, Telflammar Shadowlord 2, Bard 3, Wizard 3, Vigilante 3, Sorcerer 3, Sha'ir 3, " +
-        "Runescarred Berserker 3, Jester 3, Fatemaker 3, Beguiler 3, Wu Jen 3, Time 3, Celerity 4";
+    let level       = "Sor/Wiz 3"; //"Trapsmith 1, Telflammar Shadowlord 2, Bard 3, Wizard 3, Vigilante 3, Sorcerer 3, Sha'ir 3, " +
+        //"Runescarred Berserker 3, Jester 3, Fatemaker 3, Beguiler 3, Wu Jen 3, Time 3, Celerity 4";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
@@ -1541,8 +1929,7 @@ haste = function(caster_id, target_id, meta_effect, metas, info=null) {
     let saving_throw= "Fortitude negates (harmless)";
     let spell_resist= "Yes (harmless)";
     let ranged_touch= undefined;
-    let notes       = "The transmuted creatures move and act more quickly than normal. This extra speed has " +
-        "several effects. When making a full attack action, a hasted creature may make **one extra attack** with any " +
+    let notes       = "When making a full attack action, a hasted creature may make **one extra attack** with any " +
         "weapon he is holding. The attack is made using the creature's **full base attack bonus**, plus any modifiers " +
         "appropriate to the situation. (This effect is **not cumulative with similar effects**, such as that provided by " +
         "a weapon of speed, **nor does it actually grant an extra action**, so you can't use it to cast a second spell " +
@@ -1551,8 +1938,7 @@ haste = function(caster_id, target_id, meta_effect, metas, info=null) {
         "Class (if any) also makes you lose dodge bonuses. All of the hasted creature's modes of **movement** (" +
         "including land movement, burrow, climb, fly, and swim) **increase by 30 feet**, to a **maximum of twice** " +
         "the subject's normal speed using that form of movement. This increase counts as an enhancement bonus, " +
-        "and it affects the creature's jumping distance as normal for increased speed. Multiple haste effects don't " +
-        "stack. Haste dispels and counters slow.";
+        "and it affects the creature's jumping distance as normal for increased speed.";
     let fx          = undefined;
 
     let addtnl_setattr = '--dodgebonus4bonus|1 --dodgebonus4name|Haste --dodgebonus4notes|Haste +1 AC';
@@ -1606,7 +1992,7 @@ haste_3_0 = function(caster_id, target_id, meta_effect, metas, info=null) {
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
     let school      = "Transmutation";
-    let level       = "Brd 3, Sor/Wiz 3";
+    let level       = "Sor/Wiz 3";//"Brd 3, Sor/Wiz 3";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
@@ -1674,7 +2060,7 @@ low_light_vision = function(caster_id, target_id, meta_effect, metas, info=null)
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
     let school      = "Transmutation";
-    let level       = "Assassin 1, Druid 1, Ranger 1, Sorcerer 1, Wizard 1";
+    let level       = "Sor/Wiz 1";//"Assassin 1, Druid 1, Ranger 1, Sorcerer 1, Wizard 1";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
@@ -1732,8 +2118,8 @@ mage_armor = function(caster_id, target_id, meta_effect, metas, info=null) {
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
     let school      = "Con (Creation) [force]";
-    let level       = "Sorcerer 1, Wizard 1, Knight of the Weave 1, Beguiler 1, " +
-        "Sha'ir 1, Court Herald 1, Force 1, Spell 1";
+    let level       = "Sor/Wiz 1";//"Sorcerer 1, Wizard 1, Knight of the Weave 1, Beguiler 1, " +
+        //"Sha'ir 1, Court Herald 1, Force 1, Spell 1";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
@@ -1808,7 +2194,7 @@ magic_missile = function(caster_id, target_id, meta_effect, metas, info=null) {
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+")";
     let school      = "Evo [force]";
-    let level       = " Sor/Wiz 1, Warmage 1, Knight of the Weave 1, Nentyar Hunter 1, Sha'ir 1, Wu Jen 1, Force 2";
+    let level       = "Sor/Wiz 1";//" Sor/Wiz 1, Warmage 1, Knight of the Weave 1, Nentyar Hunter 1, Sha'ir 1, Wu Jen 1, Force 2";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
@@ -1942,7 +2328,7 @@ protection_from_arrows = function(caster_id, target_id, meta_effect, metas, info
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
     let school      = "Abj";
-    let level       = "Sor/Wiz 2, Wu Jen 2 (Metal), Sha'ir 2";
+    let level       = "Sor/Wiz 2";// "Sor/Wiz 2, Wu Jen 2 (Metal), Sha'ir 2";
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
@@ -2104,6 +2490,12 @@ wall_of_gloom = function(caster_id, target_id, meta_effect, metas, info=null) {
 
 const spells = {
     "read_magic" : read_magic,
+    "vigilant_slumber" : vigilant_slumber,
+    "endure_elements" : endure_elements,
+    "persistent_blade" : persistent_blade,
+    "comprehend_languages" : comprehend_languages,
+    "protection_from_evil" : protection_from_evil,
+    "feather_fall" : feather_fall,
     "lesser_orb_fire" : lesser_orb_fire,
     "dimension_door"  : dimension_door,
     "burning_blood" : burning_blood,
@@ -2123,5 +2515,5 @@ const spells = {
     'wall_of_gloom' : wall_of_gloom
 };
 
-const no_target = ['arcane_sight', 'read_magic', 'dimension_door', 'defenestrating_sphere', 'dispel_magic', 'fireball', 'fireburst',
+const no_target = ['arcane_sight', 'read_magic', 'comprehend_languages', 'persistent_blade', 'vigilant_slumber','feather_fall', 'dimension_door', 'defenestrating_sphere', 'dispel_magic', 'fireball', 'fireburst',
     'haste', 'magic_missile', 'mass_darkvision', 'wall_of_gloom'];
