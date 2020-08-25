@@ -9,11 +9,10 @@
  * add heighten feat
  * add explode feat
  * find and fix bugs
- * *shield and mage armor gm macro fix
  */
 const debug = false;
 const disable_sudden_check = true;
-const version = 'v0.8.4.pre-release';
+const version = 'v0.8.5.pre-release';
 chatWorkaround = function(message, who, spell=undefined)
 {
     if(spell !== undefined){
@@ -3749,6 +3748,77 @@ cats_grace = function(caster_id, target_id, meta_effect, metas, info=null) {
     }
 };
 
+rope_trick = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Rope Trick";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/rope-trick--2866/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: 'Powdered corn extract and a twisted loop of parchment.',
+            f: undefined
+        };
+    }
+
+    let compatible_feats = [
+        'extend_spell', 'sudden_extend',
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+")";
+    let school      = "Transmutation";
+    let level       = "Sor/Wiz 2";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    comp   += "M";
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Touch";
+    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours';
+    let effect      = undefined;
+    let saving_throw= "None";
+    let spell_resist= "No";
+    let ranged_touch= undefined;
+    let notes       = "When this spell is cast upon a piece of rope from 5 to 30 feet long, one end of the rope rises " +
+        "into the air until the whole rope hangs perpendicular to the ground, as if affixed at the upper end. The upper " +
+        "end is, in fact, fastened to an extradimensional space that is outside the multiverse of extradimensional spaces " +
+        "(planes). Creatures in the extradimensional space are hidden, beyond the reach of spells (including divinations), " +
+        "unless those spells work across planes. The space holds as many as eight creatures (of any size)." +
+        "Creatures in the space can pull the rope up into the space, making the rope \"disappear\"." +
+        "In that case, the rope counts as one of the eight creatures that can fit in the space." +
+        "The rope can support up to 16,000 pounds." +
+        "A weight greater than that can pull the rope free." +
+        "Spells cannot be cast across the extradimensional interface, nor can area effects cross it." +
+        "Those in the extradimensional space can see out of it as if a 3-foot-by-5-foot window were centered on the rope." +
+        "The window is present on the Material Plane, but it's invisible, and even creatures that can see the window can't see through it." +
+        "Anything inside the extradimensional space drops out when the spell ends." +
+        "The rope can be climbed by only one person at a time." +
+        "The rope trick spell enables climbers to reach a normal place if they do not climb all the way to the extradimensional space." +
+        "Note: It is hazardous to create an extradimensional space within an existing extradimensional space or to take an extradimensional space into an existing one.";
+
+    let fx          = undefined;
+    let gm_command  =  undefined;
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
 knock = function(caster_id, target_id, meta_effect, metas, info=null) {
     let spellname   = "Knock";
     let url         = "https://dndtools.net/spells/players-handbook-v35--6/knock--2829/";
@@ -4050,6 +4120,114 @@ lightning_bolt = function(caster_id, target_id, meta_effect, metas, info=null) {
         "It can melt metals with a low melting point, such as lead, gold, copper, silver, or bronze." +
         "If the damage caused to an interposing barrier shatters or breaks through it, the bolt may continue " +
         "beyond the barrier if the spell's range permits; otherwise, it stops at the barrier just as any other spell effect does.";
+
+    //let fx_speed    = 20;
+    //let fx_duration = Math.round(calc_distance({ x : caster.token.get('left'), y : caster.token.get('top')},
+    //    { x : target.token.get('left'), y : target.token.get('top')})/fx_speed);
+    let fx          =  undefined;/**{
+        'from_x'    : caster.token.get('left'),
+        'from_y'    : caster.token.get('top'),
+        'effect'    : undefined,
+        'to_x'      : target.token.get('left'),
+        'to_y'      : target.token.get('top'),
+        'custom'    : {
+            "angleRandom": -1,
+            "duration": fx_duration,
+            "emissionRate": 600,
+            "endColour": [255, 223, 94, 1],
+            "endColourRandom": [30, 20, 0, 0],
+            "lifeSpan": fx_duration,
+            "lifeSpanRandom": -1,
+            "maxParticles": 1,
+            "size": 10,
+            "gravity": {x : 0.0, y: 0.0},
+            "sizeRandom": -1,
+            "speed": fx_speed,
+            "speedRandom": -1,
+            "startColour": [255, 223, 94, 1],
+            "startColourRandom": [30, 20, 0, 0],
+            "angle": calc_angle({ x : caster.token.get('left'), y : caster.token.get('top')},
+                { x : target.token.get('left'), y : target.token.get('top')}),
+        },
+        'line'      : true
+    };**/
+    let gm_command  =  undefined;
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+shatterfloor = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Shatterfloor";
+    let url         = "https://dndtools.net/spells/spell-compendium--86/shatterfloor--4157/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: 'A miniature hammer and bell worth at least 10 gp.'
+        };
+    }
+
+    let compatible_feats = [
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still',
+        'maximize_spell', 'sudden_maximize',
+        'empower_spell', 'sudden_empower',
+        'enlarge_spell', 'sudden_enlarge',
+        'widen_spell', 'sudden_widen'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+
+    if(target.name === undefined){
+        target.name = 'creature';
+    }
+
+    let spell_tag   = "casts ["+spellname+"]("+url+")";
+    let school      = "Evocation (sonic)";
+    let level       = "Sor/Wiz 3";//"Sor/Wiz 3, Warmage 3, Wu Jen 3 (Fire), Sha'ir 3, Shugenja 4 (Agasha School)";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    comp   += 'F';
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = (((meta_effect.enlarge_spell)? 200 : 100) + 10*caster.casterlevel) +" ft";
+    let duration    = 'Instantaneous';
+    let effect      = 'Sonic wave with '+ ((meta_effect.widen_spell)? 30 : 15) +' ft radius';
+    let saving_throw= "Reflex (half)<br>(DC: [[@{spelldc3}+@{sf-evocation}]])";
+    let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
+    let ranged_touch= undefined;
+    let checkroll   = '';
+    if(meta_effect.maximize_spell && meta_effect.empower_spell){ //maximize and empower
+        checkroll += '[['+(Math.min(caster.casterlevel,10))*4+'+floor('+Math.min(caster.casterlevel,10)+'d4 * 0.5)]]';
+    }else if(meta_effect.maximize_spell){ //maximize but no empower
+        checkroll += '[['+(Math.min(caster.casterlevel,10))*4+']] ';
+    }else if(meta_effect.empower_spell){ //empower but no maximize
+        checkroll += '[[floor('+(Math.min(caster.casterlevel,10))+'d4 * 1.5)]] ';
+    }else{  //no maximze and no empower
+        checkroll += '[['+(Math.min(caster.casterlevel,10))+'d4]] ';
+    }
+
+
+    let notes  = "You strike the bell with the hammer and evoke a loud thrumming vibration. It quickly builds to a " +
+        "painful crescendo, then fades. In its wake it leaves a circle of crushed stone and rubble." +
+        "Creatures and objects in the area take " + checkroll + " points of sonic damage, and can make a saving throw to " +
+        "take half damage. If the floor of the area is made of stone, wood, ice, or material with hardness less than " +
+        "those, the floor is pulverized, resulting in an area of difficult terrain composed of soft dust, wood " +
+        "fragments, or loose crushed ice, as appropriate.";
 
     //let fx_speed    = 20;
     //let fx_duration = Math.round(calc_distance({ x : caster.token.get('left'), y : caster.token.get('top')},
@@ -4426,6 +4604,7 @@ const spells = {
     'resist_energy' : resist_energy,
     'spectral_hand' : spectral_hand,
     'cats_grace' : cats_grace,
+    'rope_trick' : rope_trick,
     'knock' : knock,
     'web' : web,
     'invisibility' : invisibility,
@@ -4433,6 +4612,7 @@ const spells = {
     'fly' : fly,
     'shrink_item' : shrink_item,
     'protection_from_energy' : protection_from_energy,
+    'shatterfloor' : shatterfloor,
     'vampiric_touch' : vampiric_touch
 };
 
@@ -4441,4 +4621,4 @@ const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', '
     'persistent_blade', 'vigilant_slumber','feather_fall', 'dimension_door', 'defenestrating_sphere',
     'dispel_magic', 'fireball', 'fireburst', 'haste', 'magic_missile', 'mass_darkvision',
     'wall_of_gloom', 'detect_thoughts', 'locate_object', 'see_invisibility', 'darkness',
-    'spectral_hand', 'knock', 'web', 'lightning_bolt', 'shrink_item'];
+    'spectral_hand', 'knock', 'web', 'lightning_bolt', 'shrink_item', 'shatterfloor', 'rope_trick'];
