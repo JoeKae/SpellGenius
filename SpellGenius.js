@@ -12,7 +12,7 @@
  */
 const debug = false;
 const disable_sudden_check = true;
-const version = 'v0.8.5.pre-release';
+const version = 'v0.8.6.pre-release';
 chatWorkaround = function(message, who, spell=undefined)
 {
     if(spell !== undefined){
@@ -4524,14 +4524,13 @@ vampiric_touch = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
     comp   += (meta_effect.still_spell)? '' : 'S,';
-    comp   += "F";
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Creature touched";
     let duration    = 'Instantaneous';
     let effect      = undefined;
-    let saving_throw= "Fortitude negates (harmless)";
-    let spell_resist= "Yes (harmless)";
+    let saving_throw= "None";
+    let spell_resist= "Yes <br> (DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
     let ranged_touch= undefined;
     let checkroll   = '';
     if(meta_effect.maximize_spell && meta_effect.empower_spell){ //maximize and empower
@@ -4560,6 +4559,352 @@ vampiric_touch = function(caster_id, target_id, meta_effect, metas, info=null) {
     }
 };
 
+polymorph = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Polymorph";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/polymorph--2854/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: 'An empty cocoon',
+            f: undefined
+        };
+    }
+
+    let compatible_feats = [
+        'extend_spell', 'sudden_extend',
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
+    let school      = "Transmutation";
+    let level       = "Sor/Wiz 4";// "Sor/Wiz 2, Wu Jen 2 (Metal), Sha'ir 2";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    comp   += 'M';
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Willing living creature touched";
+    let duration    = (((meta_effect.extend_spell)? 2 : 1) * caster.casterlevel) +" minutes";
+    let effect      = undefined;
+    let saving_throw= "None";
+    let spell_resist= "No";
+    let ranged_touch= undefined;
+    let hd = Math.min(15, caster.casterlevel);
+    let notes       ="**HD: "+ hd + "**<br>" +
+        "You change the willing subject into another form of living creature. The new form may be of the same type as the subject or any of the following types: **aberration, animal, dragon, fey, giant, humanoid, magical beast, monstrous humanoid, ooze, plant, or vermin**.  You can't cause a subject to assume a form smaller than Fine, nor can you cause a subject to assume an incorporeal or gaseous form. The subject's creature type and subtype (if any) change to match the new form (see the Monster Manual for more information). " +
+        "Upon changing, the subject regains lost hit points as if it had rested for a night (though this healing does not restore temporary ability damage and provide other benefits of resting; and changing back does not heal the subject further). If slain, the subject reverts to its original form, though it remains dead." +
+        "The subject **gains the Strength, Dexterity, and Constitution scores** of the new form but **retains its own Intelligence, Wisdom, and Charisma scores**. It also **gains all extraordinary special attacks** possessed by the form (such as constrict, improved grab, and poison) but **does not gain the extraordinary special qualities** possessed by the new form (such as blindsense, fast healing, regeneration, and scent) or any supernatural or spell-like abilities." +
+        "Incorporeal or gaseous creatures are immune to being polymorphed, and a creature with the shapechanger subtype (such as a lycanthrope or a doppelganger) can revert to its natural form as a standard action.";
+
+
+    let fx          = undefined;
+    let gm_command  =  undefined;
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+alter_self = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Alter Self";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/alter-self--2774/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: undefined
+        };
+    }
+
+    let compatible_feats = [
+        'extend_spell', 'sudden_extend',
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
+    let school      = "Transmutation";
+    let level       = "Sor/Wiz 2";// "Sor/Wiz 2, Wu Jen 2 (Metal), Sha'ir 2";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S';
+
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Personal";
+    let duration    = (((meta_effect.extend_spell)? 20 : 10) * caster.casterlevel) +" minutes";
+    let effect      = 'You assume the form of a creature of the same type as your normal form (such as humanoid or magical beast).';
+    let saving_throw= "None";
+    let spell_resist= "No";
+    let ranged_touch= undefined;
+    let hd= Math.min(5, caster.casterlevel);
+    let notes       ="**HD:" + hd + "**<br>" +
+        "You assume the form of a creature of the same type as your normal form " +
+        "(such as humanoid or magical beast). The new form **must be within one size category of your normal size**. " +
+        "You can change into a member of your own kind or even into yourself. **You retain your own ability scores**. " +
+        "**Your class and level, hit points, alignment, base attack bonus, and base save bonuses all remain the same**. " +
+        "Your creature type and subtype (if any) remain the same regardless of your new form. " +
+        "You can freely designate the new form's minor physical qualities (such as hair color, " +
+        "hair texture, and skin color) within the normal ranges for a creature of that kind. The new form's significant " +
+        "physical qualities (such as height, weight, and gender) are also under your control, but they must fall within " +
+        "the norms for the new form's kind. You are effectively disguised as an average member of the new form's race. " +
+        "If you use this spell to create a disguise, you get a **+10 bonus on your Disguise check**. When the change " +
+        "occurs, **your equipment**, if any, either **remains worn or held by the new form** " +
+        "(if it is capable of wearing or holding the item), **or melds into the new form and becomes nonfunctional**. " +
+        "When you revert to your true form, any objects previously melded into the new form reappear in the same " +
+        "location on your body they previously occupied and are once again functional. Any new items you wore in the " +
+        "assumed form and can't wear in your normal form fall off and land at your feet; any that you could wear in " +
+        "either form or carry in a body part common to both forms (mouth, hands, or the like) at the time of reversion " +
+        "are still held in the same way. Any part of the body or piece of equipment that is separated from the whole " +
+        "reverts to its true form.";
+
+
+    let fx          = undefined;
+    let gm_command  =  undefined;
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+hallucinatory_terrain = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Hallucinatory Terrain";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/hallucinatory-terrain--2671/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: 'A stone, a twig, and a bit of green plant',
+            f: undefined
+        };
+    }
+
+    let compatible_feats = [
+        'extend_spell', 'sudden_extend',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still',
+        'enlarge_spell', 'sudden_enlarge'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+") on "+target.name;
+    let school      = "Illusion";
+    let level       = "Sor/Wiz 4";// "Sor/Wiz 2, Wu Jen 2 (Metal), Sha'ir 2";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    comp   += "M";
+
+    let cast_time   = "10 minutes";
+    let range       = (((meta_effect.enlarge_spell)? 800 : 400) + 40 * caster.casterlevel) +" ft";
+    let duration    = (((meta_effect.extend_spell)? 4 : 2) * caster.casterlevel) +" hours";
+    let effect      = undefined;
+    let saving_throw= "Will disbelief (if interacted with) <br> (DC: [[@{spelldc4}+@{sf-illusion}]])";
+    let spell_resist= "No";
+    let ranged_touch= undefined;
+
+    let notes       ="You make natural terrain look, sound, and smell like some other sort of natural terrain. " +
+        "Thus, open fields or a road can be made to resemble a swamp, hill, crevasse, or some other difficult " +
+        "or impassable terrain. A pond can be made to seem like a grassy meadow, a precipice like a gentle slope, " +
+        "or a rock-strewn gully like a wide and smooth road. Structures, equipment, and creatures within the " +
+        "area are not hidden or changed in appearance. Material Component: A stone, a twig, and a bit of green plant.";
+
+
+    let fx          = undefined;
+    let gm_command  =  undefined;
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+
+whispering_wind = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Whispering Wind";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/whispering-wind--2895/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: undefined
+        };
+    }
+
+    let compatible_feats = [
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still',
+        'enlarge_spell', 'sudden_enlarge',
+        'widen_spell', 'sudden_widen',
+        'extend_spell', 'sudden_extend'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+
+    if(target.name === undefined){
+        target.name = 'creature';
+    }
+
+    let spell_tag   = "casts ["+spellname+"]("+url+")";
+    let school      = "Transmutation (Air)";
+    let level       = "Sor/Wiz 2";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = ((meta_effect.widen_spell)? 2 : 1) * caster.casterlevel + " miles";
+    let duration    = ((meta_effect.extend_spell)? 2: 1) * caster.casterlevel + 'hours or until discharged ' +
+        '(destination is reached)';
+    let effect      = 'You send a message or sound on the wind to a designated area of ' + ((meta_effect.widen_spell)? 20 : 10) + 'ft';
+    let saving_throw= "None";
+    let spell_resist= "No";
+    let ranged_touch= undefined;
+
+    let notes  = "The whispering wind travels to a specific location within range that is familiar to you, provided that it can find a way to the location. (It can't pass through walls, for instance). A whispering wind is as gentle and unnoticed as a zephyr until it reaches the location. It then delivers its whisper-quiet message or other sound. Note that the message is delivered regardless of whether anyone is present to hear it. The wind then dissipates. You can prepare the spell to bear a message of **no more than 25 words**, cause the spell to deliver **other sounds for 1 round**, or merely have the whispering wind seem to be a faint stirring of the air. You can likewise cause the whispering wind to **move as slowly as 1 mile per hour or as quickly as 1 mile per 10 minutes**. When the spell reaches its objective, it swirls and remains in place until the message is delivered. As with magic mouth, whispering wind **cannot speak verbal components, use command words, or activate magical effects**.";
+
+    let fx          =  undefined;
+    let gm_command  = 'Whispering Wind message: **?{Message}**';
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+wall_of_ice = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Wall of Ice";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/wall-of-ice--2660/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: 'A small piece of quartz or similar rock crystal.',
+            f: undefined
+        };
+    }
+
+    let compatible_feats = [
+        'enlarge_spell', 'sudden_enlarge',
+        'extend_spell', 'sudden_extend',
+        'widen_spell', 'sudden_widen',
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+")";
+    let school      = "Evocation [Cold]";
+    let level       = "Sor/Wiz 4";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    comp   += "M";
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
+    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let effect      = 'Anchored plane of ice, up to one ' + ((meta_effect.widen_spell)? 20 : 10) * caster.casterlevel +
+        ' ft. square, or hemisphere of ice with a radius of up to ' + (3 +  caster.casterlevel) + ' ft.';
+    let saving_throw= "Reflex negates; see text<br>(DC: [[@{spelldc4}+@{sf-illusion}]])";
+    let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
+    let ranged_touch= undefined;
+    let dc = (15 + caster.casterlevel);
+    let notes       = "This spell creates an anchored plane of ice or a hemisphere of ice, depending on the version " +
+        "selected. A wall of ice cannot form in an area occupied by physical objects or creatures. Its surface must " +
+        "be smooth and unbroken when created. Any creature adjacent to the wall when it is created may attempt " +
+        "a Reflex save to disrupt the wall as it is being formed. A successful save indicates that the spell " +
+        "automatically fails. " +
+        "**Fire, including a fireball spell and red dragon breath, can melt a wall of ice, and it deals full " +
+        "damage to the wall (instead of the normal half damage taken by objects)**. Suddenly melting a wall of ice " +
+        "creates a great cloud of steamy fog that lasts for 10 minutes. " +
+        "<br>**-> Ice Plane:**<br>" +
+        "A sheet of strong, hard ice appears. The wall is **" + caster.casterlevel + " inch thick**. " +
+        "It covers up to a **" + ((meta_effect.widen_spell)? 20 : 10) * caster.casterlevel + " ft.-square area.** " +
+        "The plane can be oriented in any fashion as long as it is anchored. A vertical wall need only be anchored on " +
+        "the floor, while a horizontal or slanting wall must be anchored on two opposite sides. " +
+        "The wall is primarily defensive in nature and is used to stop pursuers from following you and the like. " +
+        "Each **10-foot square of wall has " + (3 * caster.casterlevel) + " hit points**. " +
+        "Creatures can hit the wall automatically. A section of wall whose hit points drop to 0 is breached. " +
+        "If a creature tries to **break through the wall with a single attack**, the **DC for the Strength " +
+        "check is " + dc + "**. Even when the ice has been broken through, a sheet of frigid air remains. " +
+        "**Any creature stepping through it takes 1d6 + " + caster.casterlevel + " points of cold damage (no save)**. " +
+        "<br>**-> Hemisphere:**<br>" +
+        "The wall takes the form of a hemisphere whose **maximum radius is " + (3 +  caster.casterlevel) + " ft.** "
+        "The hemisphere is as hard to break through as the ice plane form, but it **does not deal damage** " +
+        "to those who go through a breach. ";
+
+    let fx          = undefined;
+    let gm_command  =   undefined;
+
+
+    if(info === null){
+        let spell = create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+        return spell;
+    }
+};
+
+
 const spells = {
     "read_magic" : read_magic,
     "unseen_servant" : unseen_servant,
@@ -4587,7 +4932,7 @@ const spells = {
     'fireball' : fireball,
     'fireburst' : fireburst,
     'haste' : haste,
-    'haste_3_0' : haste_3_0,
+    // 'haste_3_0' : haste_3_0,
     'low_light_vision' : low_light_vision,
     'mage_armor'  : mage_armor,
     'magic_missile' : magic_missile,
@@ -4613,7 +4958,12 @@ const spells = {
     'shrink_item' : shrink_item,
     'protection_from_energy' : protection_from_energy,
     'shatterfloor' : shatterfloor,
-    'vampiric_touch' : vampiric_touch
+    'vampiric_touch' : vampiric_touch,
+    'hallucinatory_terrain' : hallucinatory_terrain,
+    'polymorph': polymorph,
+    'whispering_wind': whispering_wind,
+    'wall_of_ice': wall_of_ice,
+    'alter_self': alter_self
 };
 
 const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', 'shield', 'mount',
@@ -4621,4 +4971,5 @@ const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', '
     'persistent_blade', 'vigilant_slumber','feather_fall', 'dimension_door', 'defenestrating_sphere',
     'dispel_magic', 'fireball', 'fireburst', 'haste', 'magic_missile', 'mass_darkvision',
     'wall_of_gloom', 'detect_thoughts', 'locate_object', 'see_invisibility', 'darkness',
-    'spectral_hand', 'knock', 'web', 'lightning_bolt', 'shrink_item', 'shatterfloor', 'rope_trick'];
+    'spectral_hand', 'knock', 'web', 'lightning_bolt', 'shrink_item', 'shatterfloor', 'rope_trick',
+    'hallucinatory_terrain', 'whispering_wind', 'wall_of_ice', 'alter_self'];
