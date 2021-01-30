@@ -13,6 +13,14 @@
 const debug = false;
 const disable_sudden_check = true;
 const version = 'v0.8.6.pre-release';
+/**
+ * helpers
+ */
+spell_resist = {
+    yes: "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])",
+    no: "No"
+};
+
 chatWorkaround = function(message, who, spell=undefined)
 {
     if(spell !== undefined){
@@ -4866,7 +4874,7 @@ wall_of_ice = function(caster_id, target_id, meta_effect, metas, info=null) {
     let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
     let effect      = 'Anchored plane of ice, up to one ' + ((meta_effect.widen_spell)? 20 : 10) * caster.casterlevel +
         ' ft. square, or hemisphere of ice with a radius of up to ' + (3 +  caster.casterlevel) + ' ft.';
-    let saving_throw= "Reflex negates; see text<br>(DC: [[@{spelldc4}+@{sf-illusion}]])";
+    let saving_throw= "Reflex negates; see text<br>(DC: [[@{spelldc4}+@{sf-evocation}]])";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
     let ranged_touch= undefined;
     let dc = (15 + caster.casterlevel);
@@ -4904,6 +4912,68 @@ wall_of_ice = function(caster_id, target_id, meta_effect, metas, info=null) {
     }
 };
 
+major_image = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Major Image";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/major-image--2681/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: 'A bit of Fleece'
+        };
+    }
+
+    let compatible_feats = [
+        'enlarge_spell', 'sudden_enlarge',
+        'extend_spell', 'sudden_extend',
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+")";
+    let school      = "Illusion [Figment]";
+    let level       = "Sor/Wiz 3";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    comp   += "F";
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Long: "+((400*((meta_effect.enlarge_spell)? 2 : 1))+40*caster.casterlevel) +" ft";
+    let duration    = 'Concentration +'caster.casterlevel*((meta_effect.extend_spell)? 6 : 3)+' rounds';
+    let effect      = 'Visual figment that cannot extend beyond four ' +
+        ((meta_effect.widen_spell)? 80 : 40)+(10*caster.casterlevel)+'ft. cubes.';
+    let saving_throw= "Will disbelief (if interacted with)<br>(DC: [[@{spelldc3}+@{sf-illusion}]])";
+    let spell_resist= spell_resist.no;
+    let ranged_touch= undefined;
+    let dc = (15 + caster.casterlevel);
+    let notes       = "This spell creates the visual illusion of an" +
+        "object, creature, or force, as visualized by" +
+        "you. The illusion does create sound," +
+        "smell, texture and temperature. You can" +
+        "move the image within the limits of the" +
+        "size of the effect.";
+
+    let fx          = undefined;
+    let gm_command  =   undefined;
+
+
+    if(info === null){
+        return create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+    }
+};
 
 const spells = {
     "read_magic" : read_magic,
@@ -4963,7 +5033,8 @@ const spells = {
     'polymorph': polymorph,
     'whispering_wind': whispering_wind,
     'wall_of_ice': wall_of_ice,
-    'alter_self': alter_self
+    'alter_self': alter_self,
+    'major_image': major_image
 };
 
 const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', 'shield', 'mount',
@@ -4972,4 +5043,4 @@ const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', '
     'dispel_magic', 'fireball', 'fireburst', 'haste', 'magic_missile', 'mass_darkvision',
     'wall_of_gloom', 'detect_thoughts', 'locate_object', 'see_invisibility', 'darkness',
     'spectral_hand', 'knock', 'web', 'lightning_bolt', 'shrink_item', 'shatterfloor', 'rope_trick',
-    'hallucinatory_terrain', 'whispering_wind', 'wall_of_ice', 'alter_self'];
+    'hallucinatory_terrain', 'whispering_wind', 'wall_of_ice', 'alter_self', 'major_image'];
