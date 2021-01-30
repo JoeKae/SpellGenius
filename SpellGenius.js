@@ -5397,7 +5397,7 @@ scorch = function(caster_id, target_id, meta_effect, metas, info=null) {
     let meta        = (metas.length > 0)? metas : "No";
 
     let comp        = (meta_effect.silent_spell)? '' : 'V,';
-    comp    += (meta_effect.still_spell)? '' : 'S';
+    comp    += (meta_effect.still_spell)? '' : 'S,';
     comp    += 'F';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = range_preset.none;
@@ -5417,6 +5417,91 @@ scorch = function(caster_id, target_id, meta_effect, metas, info=null) {
         checkroll = '[[floor(('+dice+'d8)*1.5)]] ';
     }
     let notes       = "Scorch deals "+checkroll+" points of damage to each target it hits.";
+
+    let fx          = undefined;
+    let gm_command  =   undefined;
+
+
+    if(info === null){
+        return create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+    }
+};
+
+fog_cloud = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Fog cloud";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/fog-cloud--2393/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: undefined
+        };
+    }
+
+    let compatible_feats = [
+//        ...meta_feat_selector.empower, /* dmg x 1,5 */
+        ...meta_feat_selector.enlarge, /* range x 2 */
+        ...meta_feat_selector.extend, /* duration x 2 */
+//        ...meta_feat_selector.maximize, /* max rolls */
+        ...meta_feat_selector.quicken, /* free action cast time */
+        ...meta_feat_selector.silent, /* no verbal componen */
+        ...meta_feat_selector.still, /* no somatic component */
+        ...meta_feat_selector.widen /* AoE x 2 */
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    const range_preset = {
+        close: "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*Math.floor(caster.casterlevel/2)) +" ft",
+        medium: "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft",
+        long: "Long: "+((400*((meta_effect.enlarge_spell)? 2 : 1))+40*caster.casterlevel) +" ft",
+        personal: "Personal",
+        none: undefined
+    };
+
+    const duration_preset = {
+        days: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' days',
+        hours: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours',
+        minutes: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes',
+        seconds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' seconds',
+        rounds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds',
+        instantaneous: 'instantaneous'
+    };
+
+    const ranged_touch_preset = {
+        yes: "[[1d20 + "+caster.get_attr('bab')+'+'+caster.get_attr('dex-mod')+"]]",
+        no: undefined
+    };
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+")";
+    let school      = "Conjuration";
+    let level       = "Sor/Wiz 2";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp    += (meta_effect.still_spell)? '' : 'S';
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = range_preset.medium;
+    let duration    = 10*duration_preset.minutes;
+    let effect      = 'Fog spreads in '+((meta_effect.widen_spell)? 40 : 20)+'ft. radius and high';
+    let saving_throw= "None";
+    let spell_resist= spell_resist.no;
+    let ranged_touch= ranged_touch_preset.no;
+    let dc = (15 + caster.casterlevel);
+
+    let notes       = "A bank of fog billows out from the point you designate. The fog obscures all sight, " +
+        "including darkvision, beyond 5 feet. A creature within 5 feet has concealment " +
+        "(attacks have a 20% miss chance). Creatures farther away have total concealment (50% miss chance, " +
+        "and the attacker can't use sight to locate the target). A moderate wind (15+ kph) disperses the fog in 4 " +
+        "rounds; a strong wind (30+ mph) disperses the fog in 1 round. The spell does not function underwater.";
 
     let fx          = undefined;
     let gm_command  =   undefined;
@@ -5492,7 +5577,8 @@ const spells = {
     'nightshield': nightshield,
     'ray_of_flame': ray_of_flame,
     'deep_breath': deep_breath,
-    'scorch': scorch
+    'scorch': scorch,
+    'fog_cloud': fog_cloud
 };
 
 const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', 'shield', 'mount',
@@ -5502,4 +5588,4 @@ const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', '
     'wall_of_gloom', 'detect_thoughts', 'locate_object', 'see_invisibility', 'darkness',
     'spectral_hand', 'knock', 'web', 'lightning_bolt', 'shrink_item', 'shatterfloor', 'rope_trick',
     'hallucinatory_terrain', 'whispering_wind', 'wall_of_ice', 'alter_self', 'major_image', 'dark_way',
-    'devils_eye', 'nightshield', 'deep_breath', 'scorch'];
+    'devils_eye', 'nightshield', 'deep_breath', 'scorch', 'fog_cloud'];
