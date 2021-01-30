@@ -4952,7 +4952,7 @@ major_image = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Long: "+((400*((meta_effect.enlarge_spell)? 2 : 1))+40*caster.casterlevel) +" ft";
-    let duration    = 'Concentration +'caster.casterlevel*((meta_effect.extend_spell)? 6 : 3)+' rounds';
+    let duration    = 'Concentration +'+((meta_effect.extend_spell)? 6 : 3)+' rounds';
     let effect      = 'Visual figment that cannot extend beyond four ' +
         ((meta_effect.widen_spell)? 80 : 40)+(10*caster.casterlevel)+'ft. cubes.';
     let saving_throw= "Will disbelief (if interacted with)<br>(DC: [[@{spelldc3}+@{sf-illusion}]])";
@@ -4965,6 +4965,65 @@ major_image = function(caster_id, target_id, meta_effect, metas, info=null) {
         "smell, texture and temperature. You can" +
         "move the image within the limits of the" +
         "size of the effect.";
+
+    let fx          = undefined;
+    let gm_command  =   undefined;
+
+
+    if(info === null){
+        return create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+    }
+};
+
+dark_way = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Dark Way";
+    let url         = "https://dndtools.net/spells/spell-compendium--86/dark-way--4326/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: 'Small black ribbon'
+        };
+    }
+
+    let compatible_feats = [
+        'enlarge_spell', 'sudden_enlarge',
+        'extend_spell', 'sudden_extend',
+        'quicken_spell', 'sudden_quicken',
+        'silent_spell', 'sudden_silent',
+        'still_spell', 'sudden_still'
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+")";
+    let school      = "Illusion [Shadow]";
+    let level       = "Sor/Wiz 2";
+    let meta        = (metas.length > 0)? metas : "No";
+
+    let comp        = (meta_effect.silent_spell)? '' : 'V,';
+    comp   += (meta_effect.still_spell)? '' : 'S,';
+    comp   += "F";
+
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+20*caster.casterlevel) +" ft";
+    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds';
+    let effect      = 'One bridge of force 5 ft. wide, 1 in. thick, and up to '+(caster.casterlevel*20)+' ft./level long';
+    let saving_throw= "None";
+    let spell_resist= spell_resist.yes;
+    let ranged_touch= undefined;
+    let dc = (15 + caster.casterlevel);
+    let notes       = "You create a ribbonlike, weightless unbreakable bridge. A dark way must be anchored at both ends" +
+        " to solid objects, but otherwise can be at any angle. Like a wall of force (PH 298), it must be continuous " +
+        "and unbroken when formed. Creatures can move on a dark way without penalty, since it is no more slippery than a typical dungeon floor. A dark way can support a maximum of "+(200*caster.casterlevel)+" pounds. Creatures that cause the total weight on a dark way to exceed this limit fall through it as if it weren't there, but **only** those who exceed it.";
 
     let fx          = undefined;
     let gm_command  =   undefined;
@@ -5034,7 +5093,8 @@ const spells = {
     'whispering_wind': whispering_wind,
     'wall_of_ice': wall_of_ice,
     'alter_self': alter_self,
-    'major_image': major_image
+    'major_image': major_image,
+    'dark_way': dark_way
 };
 
 const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', 'shield', 'mount',
@@ -5043,4 +5103,4 @@ const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', '
     'dispel_magic', 'fireball', 'fireburst', 'haste', 'magic_missile', 'mass_darkvision',
     'wall_of_gloom', 'detect_thoughts', 'locate_object', 'see_invisibility', 'darkness',
     'spectral_hand', 'knock', 'web', 'lightning_bolt', 'shrink_item', 'shatterfloor', 'rope_trick',
-    'hallucinatory_terrain', 'whispering_wind', 'wall_of_ice', 'alter_self', 'major_image'];
+    'hallucinatory_terrain', 'whispering_wind', 'wall_of_ice', 'alter_self', 'major_image', 'dark_way'];
