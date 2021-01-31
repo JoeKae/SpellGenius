@@ -5604,6 +5604,94 @@ dragonskin = function(caster_id, target_id, meta_effect, metas, info=null) {
     }
 };
 
+cloudkill = function(caster_id, target_id, meta_effect, metas, info=null) {
+    let spellname   = "Cloudkill";
+    let url         = "https://dndtools.net/spells/players-handbook-v35--6/cloudkill--2374/";
+    if(info === 'list'){
+        return '['+spellname+']('+url+')';
+    }
+    if(info === 'mat_comp'){
+        return {
+            m: undefined,
+            f: undefined
+        };
+    }
+
+    let compatible_feats = [
+//        ...meta_feat_selector.empower, /* dmg x 1,5 */
+//        ...meta_feat_selector.enlarge, /* range x 2 */
+        ...meta_feat_selector.extend, /* duration x 2 */
+//        ...meta_feat_selector.maximize, /* max rolls */
+        ...meta_feat_selector.quicken, /* free action cast time */
+//        ...meta_feat_selector.silent, /* no verbal componen */
+        ...meta_feat_selector.still, /* no somatic component */
+//        ...meta_feat_selector.widen /* AoE x 2 */
+    ];
+
+    meta_effect = sudden_helper(meta_effect);
+
+    if(info === 'feats'){
+        return compatible_feats;
+    }
+
+    const range_preset = {
+        close: "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*Math.floor(caster.casterlevel/2)) +" ft",
+        medium: "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft",
+        long: "Long: "+((400*((meta_effect.enlarge_spell)? 2 : 1))+40*caster.casterlevel) +" ft",
+        personal: "Personal",
+        none: undefined
+    };
+
+    const duration_preset = {
+        days: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' days',
+        hours: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours',
+        minutes: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes',
+        seconds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' seconds',
+        rounds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds',
+        instantaneous: 'instantaneous'
+    };
+
+    const ranged_touch_preset = {
+        yes: "[[1d20 + "+caster.get_attr('bab')+'+'+caster.get_attr('dex-mod')+"]]",
+        no: undefined
+    };
+
+    let caster      = create_creature(caster_id);
+    let target      = create_creature(target_id);
+    let spell_tag   = "casts ["+spellname+"]("+url+")";
+    let school      = "Conjuration";
+    let level       = "Sor/Wiz 5";
+    let meta        = (metas.length > 0)? metas : "No";
+    let comp        = (metas.silent_spell)? '' : 'V,'
+    comp        += (meta_effect.still_spell)? '' : 'S';
+    let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
+    let range       = range_preset.medium;
+    let duration    = duration_preset.minutes;
+    let effect      = "Cloud spreads in "+((metas.widen_spell)? 40 : 20 )+"-ft. radius and high";
+    let saving_throw= "Fortitude partial(see text)<br>(DC: [[@{spelldc5}+@{sf-conjuration}]])";
+    let spell_resist= spell_resist.no;
+    let ranged_touch= ranged_touch_preset.no;
+
+    let notes       = "This spell generates a bank of fog, similar to a fog cloud, except that its vapors are " +
+        "yellowish green and poisonous. These vapors automatically kill any living creature with <4 HD (no save)." +
+        "A living creature with 4 or 5 HD is slain unless it succeeds on a Fortitude save (in which case it takes " +
+        "1d4 points of Const dmg on your turn each round while in the cloud). A living creature with >=6 " +
+        "or more HD takes 1d4 points of Constitution damage on your turn each round while in the cloud " +
+        "(successful Fortitude save: half dmg). Holding one's breath doesn't help, " +
+        "but creatures immune to poison are unaffected. Unlike a fog cloud, the cloudkill moves away from " +
+        "you at 10 feet per round, rolling along the surface of the ground. " +
+        "Because the vapors are heavier than air, they sink to the lowest level of the land." +
+        "It cannot penetrate liquids, nor can it be cast underwater.";
+
+    let fx          = undefined;
+    let gm_command  =   undefined;
+
+
+    if(info === null){
+        return create_spell(spellname, caster, target, spell_tag, school, level, meta, comp, cast_time, range, duration, effect, saving_throw, spell_resist, ranged_touch, notes, fx, gm_command);
+    }
+};
+
 const spells = {
     "read_magic" : read_magic,
     "unseen_servant" : unseen_servant,
@@ -5671,7 +5759,8 @@ const spells = {
     'deep_breath': deep_breath,
     'scorch': scorch,
     'fog_cloud': fog_cloud,
-    'dragonskin': dragonskin
+    'dragonskin': dragonskin,
+    'cloudkill': cloudkill
 };
 
 const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', 'shield', 'mount',
@@ -5681,4 +5770,4 @@ const no_target = ['arcane_sight', 'read_magic', 'unseen_servant', 'identify', '
     'wall_of_gloom', 'detect_thoughts', 'locate_object', 'see_invisibility', 'darkness',
     'spectral_hand', 'knock', 'web', 'lightning_bolt', 'shrink_item', 'shatterfloor', 'rope_trick',
     'hallucinatory_terrain', 'whispering_wind', 'wall_of_ice', 'alter_self', 'major_image', 'dark_way',
-    'devils_eye', 'nightshield', 'deep_breath', 'scorch', 'fog_cloud', 'dragonskin'];
+    'devils_eye', 'nightshield', 'deep_breath', 'scorch', 'fog_cloud', 'dragonskin', 'cloudkill'];
