@@ -12,11 +12,11 @@
  */
 const debug = false;
 const disable_sudden_check = true;
-const version = 'v0.8.7.pre-release';
+const version = 'v0.8.8.pre-release';
 /**
  * helpers
  */
-spell_resist = {
+spell_resist_preset = {
     yes: "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])",
     no: "No"
 };
@@ -4965,14 +4965,14 @@ major_image = function(caster_id, target_id, meta_effect, metas, info=null) {
     let effect      = 'Visual figment that cannot extend beyond four ' +
         ((meta_effect.widen_spell)? 80 : 40)+(10*caster.casterlevel)+'ft. cubes.';
     let saving_throw= "Will disbelief (if interacted with)<br>(DC: [[@{spelldc3}+@{sf-illusion}]])";
-    let spell_resist= spell_resist.no;
+    let spell_resist= spell_resist_preset.no;
     let ranged_touch= undefined;
     let dc = (15 + caster.casterlevel);
-    let notes       = "This spell creates the visual illusion of an" +
-        "object, creature, or force, as visualized by" +
-        "you. The illusion does create sound," +
-        "smell, texture and temperature. You can" +
-        "move the image within the limits of the" +
+    let notes       = "This spell creates the visual illusion of an " +
+        "object, creature, or force, as visualized by " +
+        "you. The illusion does create sound, " +
+        "smell, texture and temperature. You can " +
+        "move the image within the limits of the " +
         "size of the effect.";
 
     let fx          = undefined;
@@ -5027,7 +5027,7 @@ dark_way = function(caster_id, target_id, meta_effect, metas, info=null) {
     let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds';
     let effect      = 'One bridge of force 5 ft. wide, 1 in. thick, and up to '+(caster.casterlevel*20)+' ft./level long';
     let saving_throw= "None";
-    let spell_resist= spell_resist.yes;
+    let spell_resist= spell_resist_preset.yes;
     let ranged_touch= undefined;
     let dc = (15 + caster.casterlevel);
     let notes       = "You create a ribbonlike, weightless unbreakable bridge. A dark way must be anchored at both ends" +
@@ -5084,7 +5084,7 @@ devils_eye = function(caster_id, target_id, meta_effect, metas, info=null) {
     let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
     let effect      = undefined;
     let saving_throw= "None";
-    let spell_resist= spell_resist.no;
+    let spell_resist= spell_resist_preset.no;
     let ranged_touch= undefined;
     let dc = (15 + caster.casterlevel);
     let notes       = "With a few words and a gesture, the darkness melts away, and you can see with perfect clarity." +
@@ -5141,7 +5141,7 @@ nightshield = function(caster_id, target_id, meta_effect, metas, info=null) {
     let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
     let effect      = 'With a whisper-quiet whoosh, a field of shadowy energy cloaks your body.';
     let saving_throw= "None";
-    let spell_resist= spell_resist.no;
+    let spell_resist= spell_resist_preset.no;
     let ranged_touch= undefined;
     let dc = (15 + caster.casterlevel);
     let bonus = 1;
@@ -5152,9 +5152,8 @@ nightshield = function(caster_id, target_id, meta_effect, metas, info=null) {
         bonus = 3;
     }
 
-    let notes       = "This spell provides a +1 resistance bonus on saving throws. " +
-        "This resistance bonus increases to +"+bonus+
-        ". In addition, the spell negates magic missile attacks directed at you.";
+    let notes       = "This spell provides a +"+bonus+" resistance bonus on saving throws. " +
+        "In addition, the spell negates magic missile attacks directed at you.";
 
     let fx          = undefined;
     let gm_command  =   undefined;
@@ -5168,6 +5167,7 @@ nightshield = function(caster_id, target_id, meta_effect, metas, info=null) {
 ray_of_flame = function(caster_id, target_id, meta_effect, metas, info=null) {
     let spellname   = "Ray of Flame";
     let url         = "https://dndtools.net/spells/spell-compendium--86/ray-flame--4066/";
+
     if(info === 'list'){
         return '['+spellname+']('+url+')';
     }
@@ -5195,6 +5195,8 @@ ray_of_flame = function(caster_id, target_id, meta_effect, metas, info=null) {
         return compatible_feats;
     }
 
+    let caster      = create_creature(caster_id);
+
     const range_preset = {
         close: "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*Math.floor(caster.casterlevel/2)) +" ft",
         medium: "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft",
@@ -5215,7 +5217,6 @@ ray_of_flame = function(caster_id, target_id, meta_effect, metas, info=null) {
         no: undefined
     };
 
-    let caster      = create_creature(caster_id);
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+")";
     let school      = "Evocation [Fire]";
@@ -5230,7 +5231,7 @@ ray_of_flame = function(caster_id, target_id, meta_effect, metas, info=null) {
     let duration    = duration_preset.instantaneous;
     let effect      = 'Ray';
     let saving_throw= "Reflex DC 15; see text";
-    let spell_resist= spell_resist.yes;
+    let spell_resist= spell_resist_preset.yes;
     let ranged_touch= ranged_touch_preset.yes;
     let dc = (15 + caster.casterlevel);
     const dice = Math.min(Math.floor(caster.casterlevel/2), 5);
@@ -5257,6 +5258,7 @@ ray_of_flame = function(caster_id, target_id, meta_effect, metas, info=null) {
 deep_breath = function(caster_id, target_id, meta_effect, metas, info=null) {
     let spellname   = "Deep Breath";
     let url         = "https://dndtools.net/spells/spell-compendium--86/deep-breath--4352/";
+
     if(info === 'list'){
         return '['+spellname+']('+url+')';
     }
@@ -5284,6 +5286,8 @@ deep_breath = function(caster_id, target_id, meta_effect, metas, info=null) {
         return compatible_feats;
     }
 
+    let caster      = create_creature(caster_id);
+
     const range_preset = {
         close: "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*Math.floor(caster.casterlevel/2)) +" ft",
         medium: "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft",
@@ -5305,7 +5309,6 @@ deep_breath = function(caster_id, target_id, meta_effect, metas, info=null) {
         no: undefined
     };
 
-    let caster      = create_creature(caster_id);
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+")";
     let school      = "Conjuration [Air]";
@@ -5319,7 +5322,7 @@ deep_breath = function(caster_id, target_id, meta_effect, metas, info=null) {
     let duration    = duration_preset.rounds;
     let effect      = undefined;
     let saving_throw= undefined;
-    let spell_resist= spell_resist.no;
+    let spell_resist= spell_resist_preset.no;
     let ranged_touch= ranged_touch_preset.no;
     let dc = (15 + caster.casterlevel);
 
@@ -5340,6 +5343,8 @@ deep_breath = function(caster_id, target_id, meta_effect, metas, info=null) {
 scorch = function(caster_id, target_id, meta_effect, metas, info=null) {
     let spellname   = "Scorch";
     let url         = "https://dndtools.org/spells/spell-compendium--86/scorch--4131/";
+
+
     if(info === 'list'){
         return '['+spellname+']('+url+')';
     }
@@ -5367,6 +5372,8 @@ scorch = function(caster_id, target_id, meta_effect, metas, info=null) {
         return compatible_feats;
     }
 
+    let caster      = create_creature(caster_id);
+
     const range_preset = {
         close: "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*Math.floor(caster.casterlevel/2)) +" ft",
         medium: "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft",
@@ -5389,7 +5396,6 @@ scorch = function(caster_id, target_id, meta_effect, metas, info=null) {
         no: undefined
     };
 
-    let caster      = create_creature(caster_id);
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+")";
     let school      = "Evocation [Fire]";
@@ -5404,7 +5410,7 @@ scorch = function(caster_id, target_id, meta_effect, metas, info=null) {
     let duration    = duration_preset.instantaneous;
     let effect      = 'Line';
     let saving_throw= "Reflex (half)<br>(DC: [[@{spelldc2}+@{sf-evocation}]])";
-    let spell_resist= spell_resist.yes;
+    let spell_resist= spell_resist_preset.yes;
     let ranged_touch= ranged_touch_preset.no;
     let dc = (15 + caster.casterlevel);
     const dice = Math.min(Math.floor(caster.casterlevel/2), 5);
@@ -5430,6 +5436,7 @@ scorch = function(caster_id, target_id, meta_effect, metas, info=null) {
 fog_cloud = function(caster_id, target_id, meta_effect, metas, info=null) {
     let spellname   = "Fog cloud";
     let url         = "https://dndtools.net/spells/players-handbook-v35--6/fog-cloud--2393/";
+
     if(info === 'list'){
         return '['+spellname+']('+url+')';
     }
@@ -5457,6 +5464,8 @@ fog_cloud = function(caster_id, target_id, meta_effect, metas, info=null) {
         return compatible_feats;
     }
 
+    let caster      = create_creature(caster_id);
+
     const range_preset = {
         close: "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*Math.floor(caster.casterlevel/2)) +" ft",
         medium: "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft",
@@ -5479,7 +5488,6 @@ fog_cloud = function(caster_id, target_id, meta_effect, metas, info=null) {
         no: undefined
     };
 
-    let caster      = create_creature(caster_id);
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+")";
     let school      = "Conjuration";
@@ -5493,7 +5501,7 @@ fog_cloud = function(caster_id, target_id, meta_effect, metas, info=null) {
     let duration    = 10*duration_preset.minutes;
     let effect      = 'Fog spreads in '+((meta_effect.widen_spell)? 40 : 20)+'ft. radius and high';
     let saving_throw= "None";
-    let spell_resist= spell_resist.no;
+    let spell_resist= spell_resist_preset.no;
     let ranged_touch= ranged_touch_preset.no;
     let dc = (15 + caster.casterlevel);
 
@@ -5515,6 +5523,7 @@ fog_cloud = function(caster_id, target_id, meta_effect, metas, info=null) {
 dragonskin = function(caster_id, target_id, meta_effect, metas, info=null) {
     let spellname   = "Dragonskin";
     let url         = "https://dndtools.net/spells/spell-compendium--86/dragonskin--4419/";
+
     if(info === 'list'){
         return '['+spellname+']('+url+')';
     }
@@ -5542,6 +5551,8 @@ dragonskin = function(caster_id, target_id, meta_effect, metas, info=null) {
         return compatible_feats;
     }
 
+    let caster      = create_creature(caster_id);
+
     const range_preset = {
         close: "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*Math.floor(caster.casterlevel/2)) +" ft",
         medium: "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft",
@@ -5564,7 +5575,6 @@ dragonskin = function(caster_id, target_id, meta_effect, metas, info=null) {
         no: undefined
     };
 
-    let caster      = create_creature(caster_id);
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+")";
     let school      = "Transmutation";
@@ -5578,7 +5588,7 @@ dragonskin = function(caster_id, target_id, meta_effect, metas, info=null) {
     let duration    = 10*duration_preset.minutes;
     let effect      = undefined;
     let saving_throw= "None";
-    let spell_resist= spell_resist.no;
+    let spell_resist= spell_resist_preset.no;
     let ranged_touch= ranged_touch_preset.no;
     let dc = (15 + caster.casterlevel);
     let armor_bonus = {
@@ -5590,9 +5600,9 @@ dragonskin = function(caster_id, target_id, meta_effect, metas, info=null) {
         sorcerer: (caster.casterlevel >= 9)? 20 : 10};
 
     let notes       = "Your skin toughens and becomes scaly like that of a chromatic dragon, of a color that you " +
-        "select. You gain an enhancement bonus to natural armor equal to "+armor_bonus.wizard+"(wiz)/"+
-        armor_bonus.sorcerer+"(sorc), as well as energy resistance "+resist_bonus.wizard+"(wiz)/"+
-        resist_bonus.sorcerer+"(sorc) against the type of energy appropriate to the color you select: " +
+        "select. You gain an enhancement bonus to natural armor equal to **"+armor_bonus.wizard+"(wiz)/"+
+        armor_bonus.sorcerer+"(sorc)**, as well as energy **resistance "+resist_bonus.wizard+"(wiz)/"+
+        resist_bonus.sorcerer+"(sorc)** against the type of energy appropriate to the color you select: " +
         "acid (black or green), cold (white), electricity (blue), or fire (red).";
 
     let fx          = undefined;
@@ -5607,6 +5617,7 @@ dragonskin = function(caster_id, target_id, meta_effect, metas, info=null) {
 cloudkill = function(caster_id, target_id, meta_effect, metas, info=null) {
     let spellname   = "Cloudkill";
     let url         = "https://dndtools.net/spells/players-handbook-v35--6/cloudkill--2374/";
+
     if(info === 'list'){
         return '['+spellname+']('+url+')';
     }
@@ -5634,6 +5645,8 @@ cloudkill = function(caster_id, target_id, meta_effect, metas, info=null) {
         return compatible_feats;
     }
 
+    let caster      = create_creature(caster_id);
+
     const range_preset = {
         close: "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*Math.floor(caster.casterlevel/2)) +" ft",
         medium: "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft",
@@ -5656,7 +5669,6 @@ cloudkill = function(caster_id, target_id, meta_effect, metas, info=null) {
         no: undefined
     };
 
-    let caster      = create_creature(caster_id);
     let target      = create_creature(target_id);
     let spell_tag   = "casts ["+spellname+"]("+url+")";
     let school      = "Conjuration";
@@ -5669,14 +5681,14 @@ cloudkill = function(caster_id, target_id, meta_effect, metas, info=null) {
     let duration    = duration_preset.minutes;
     let effect      = "Cloud spreads in "+((metas.widen_spell)? 40 : 20 )+"-ft. radius and high";
     let saving_throw= "Fortitude partial(see text)<br>(DC: [[@{spelldc5}+@{sf-conjuration}]])";
-    let spell_resist= spell_resist.no;
+    let spell_resist= spell_resist_preset.no;
     let ranged_touch= ranged_touch_preset.no;
 
     let notes       = "This spell generates a bank of fog, similar to a fog cloud, except that its vapors are " +
-        "yellowish green and poisonous. These vapors automatically kill any living creature with <4 HD (no save)." +
-        "A living creature with 4 or 5 HD is slain unless it succeeds on a Fortitude save (in which case it takes " +
-        "1d4 points of Const dmg on your turn each round while in the cloud). A living creature with >=6 " +
-        "or more HD takes 1d4 points of Constitution damage on your turn each round while in the cloud " +
+        "yellowish green and poisonous. These vapors automatically kill any living creature with **<4 HD (no save)**." +
+        "A living creature with **4 or 5 HD** is **slain unless** it succeeds on a **Fortitude** save (in which case it takes " +
+        "**1d4 points of Const dmg** on your turn each round while in the cloud). A living creature with **>=6 " +
+        "HD** takes **1d4** points of **Constitution damage** on your turn each round while in the cloud " +
         "(successful Fortitude save: half dmg). Holding one's breath doesn't help, " +
         "but creatures immune to poison are unaffected. Unlike a fog cloud, the cloudkill moves away from " +
         "you at 10 feet per round, rolling along the surface of the ground. " +
