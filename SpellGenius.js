@@ -5623,9 +5623,9 @@ cloudkill = function(caster_id, target_id, meta_effect, metas, info=null) {
         ...meta_feat_selector.extend, /* duration x 2 */
 //        ...meta_feat_selector.maximize, /* max rolls */
         ...meta_feat_selector.quicken, /* free action cast time */
-//        ...meta_feat_selector.silent, /* no verbal componen */
+        ...meta_feat_selector.silent, /* no verbal componen */
         ...meta_feat_selector.still, /* no somatic component */
-//        ...meta_feat_selector.widen /* AoE x 2 */
+        ...meta_feat_selector.widen /* AoE x 2 */
     ];
 
     meta_effect = sudden_helper(meta_effect);
