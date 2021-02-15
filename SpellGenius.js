@@ -12,7 +12,7 @@
  */
 const debug = false;
 const disable_sudden_check = true;
-const version = 'v0.8.8.pre-release';
+const version = 'v0.8.9.pre-release';
 /**
  * helpers
  */
