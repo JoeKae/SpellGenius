@@ -563,6 +563,18 @@ gen_macro = function(spell){
 };
 
 
+duration_preset = function(caster={'casterlevel': 1}, meta_effect={}, multi = 1) {
+    return {
+        days: multi*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' days',
+        hours: multi*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours',
+        minutes: multi*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes',
+        seconds: multi*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' seconds',
+        rounds: multi*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds',
+        instantaneous: 'instantaneous',
+        concentration: 'Concentration'
+    };
+}
+
 
 //meta feats
 const meta_feat_selector = {
@@ -835,7 +847,7 @@ read_magic = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Personal";
-    let duration    = 10*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "No";
@@ -888,7 +900,7 @@ shield = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Personal";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "No";
@@ -952,7 +964,7 @@ mount = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp   += "M";
     let cast_time   = "1 round";
     let range       = "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*(Math.floor(caster.casterlevel/2))) +"ft";
-    let duration    = 2*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours';
+    let duration    = duration_preset(caster, meta_effect, 2).hours;
     let effect      = 'One Mount';
     let saving_throw= "None";
     let spell_resist= "No";
@@ -1015,7 +1027,7 @@ unseen_servant = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp   += "M";
     let cast_time   = "1 standard action";
     let range       = "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*(Math.floor(caster.casterlevel/2))) +"ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours';
+    let duration    = duration_preset(caster, meta_effect, 1).hours;
     let effect      = 'One invisible, mindless, shapeless servant';
     let saving_throw= "None";
     let spell_resist= "No";
@@ -1083,7 +1095,7 @@ identify = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = "1 hour";
     let range       = "Touch";
-    let duration    = 'Instantaneous';
+    let duration    =  duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "No";
@@ -1138,7 +1150,7 @@ mage_hand_greater = function(caster_id, target_id, meta_effect, metas, info=null
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
-    let duration    = 'Concentration';
+    let duration    = duration_preset(caster, meta_effect, 1).concentration;
     let effect      = undefined;
     let saving_throw= "Will negates<br>(DC: [[@{spelldc1}+@{sf-transmutation}]])";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -1279,7 +1291,7 @@ nystuls_magic_aura = function(caster_id, target_id, meta_effect, metas, info=nul
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+" Days";
+    let duration    = duration_preset(caster, meta_effect, 1).days;
     let effect      = "Alter aura of one touched object weighing up to "+5*caster.casterlevel+" lb";
     let saving_throw= "Will (see text)<br>(DC: [[@{spelldc1}+@{sf-illusion}]])";
     let spell_resist= "No";
@@ -1344,7 +1356,7 @@ sleep = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
-    let duration    = 10*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = "Casts sleep on one or more living creatures within a "+10*((meta_effect.widen_spell)? 2 : 1) +"ft. radius burst";
     let saving_throw= "Will negates<br>(DC: [[@{spelldc1}+@{sf-enchantment}]])";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -1404,7 +1416,7 @@ disguise_self = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Personal";
-    let duration    = 10*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = undefined;
     let saving_throw= "Will (see text)<br>(DC: [[@{spelldc1}+@{sf-illusion}]])";
     let spell_resist= "No";
@@ -1467,7 +1479,7 @@ detect_secret_doors = function(caster_id, target_id, meta_effect, metas, info=nu
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = (60*((meta_effect.enlarge_spell)? 2 : 1))+"ft.";
-    let duration    = 'Concentration, up to '+(caster.casterlevel*((meta_effect.extend_spell)? 2 : 1 ))+' minutes';
+    let duration    = 'Concentration, up to '+duration_preset(caster, meta_effect, 1).minutes;
     let effect      = 'Cone-shaped emanation ('+((meta_effect.widen_spell)? '2x line of sight' : 'line of sight')+')';
     let saving_throw= "None";
     let spell_resist= "No";
@@ -1648,7 +1660,7 @@ comprehend_languages = function(caster_id, target_id, meta_effect, metas, info=n
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Personal";
-    let duration    = 10*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "No";
@@ -1708,7 +1720,7 @@ protection_from_evil = function(caster_id, target_id, meta_effect, metas, info=n
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+" minutes";
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = "magical barrier around the subject at a distance of 1 foot";
     let saving_throw= "Will negates (harmless)";
     let spell_resist= "No (see text)";
@@ -1780,7 +1792,7 @@ feather_fall = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = "free action";
     let range       = "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*(Math.floor(caster.casterlevel/2))) +"ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds or until landing';
+    let duration    = duration_preset(caster, meta_effect, 1).rounds+' or until landing';
     let effect      = "Cast Feather Fall on **"+caster.casterlevel+"** Medium freefalling objects/creatures, no two of which may be >20 ft. apart";
     let saving_throw= "Will negates";
     let spell_resist= "Yes (object)";
@@ -1845,7 +1857,7 @@ persistent_blade = function(caster_id, target_id, meta_effect, metas, info=null)
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*(Math.floor(caster.casterlevel/2))) +"ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds';
+    let duration    = duration_preset(caster, meta_effect, 1).rounds;
     let effect      = "One dagger made of force";
     let saving_throw= "No";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -1928,7 +1940,7 @@ lesser_orb_fire = function(caster_id, target_id, meta_effect, metas, info=null) 
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*(Math.floor(caster.casterlevel/2))) +"ft";
-    let duration    = 'Instantaneous';
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = 'One orb of fire';
     let saving_throw= "None";
     let spell_resist= "No";
@@ -2027,7 +2039,7 @@ dimension_door = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Long: "+((400*((meta_effect.enlarge_spell)? 2 : 1))+40*caster.casterlevel)+"ft";
-    let duration    = 'Instantaneous';
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = 'You and touched objects or up to '+(Math.floor(caster.casterlevel/3))+' other touched willing creatures(Medium) teleport.';
     let saving_throw= "None and Will negates (object)<br>(DC: [[@{spelldc4}+@{sf-conjuration}]])";
     let spell_resist= "No and Yes (object)<br>(DC: [[ 1d20+@{casterlevel2}+@{spellpen} ]]";
@@ -2100,7 +2112,7 @@ burning_blood = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp   += 'M';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +"ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds';
+    let duration    = duration_preset(caster, meta_effect, 1).rounds;
     let effect      = 'You taint a living creature\'s blood';
     let saving_throw= "Fortitude partial(see text)<br>(DC: [[@{spelldc4}+@{sf-necromancy}]])";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -2181,7 +2193,7 @@ defenestrating_sphere = function(caster_id, target_id, meta_effect, metas, info=
     comp   += 'F';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +"ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds';
+    let duration    = duration_preset(caster, meta_effect, 10).rounds;
     let effect      = '2-ft.-radius sphere';
     let saving_throw= "Fortitude partial(see text)<br>(DC: [[@{spelldc4}+@{sf-necromancy}]])";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -2273,7 +2285,7 @@ arcane_sight = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Personal";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "No";
@@ -2337,7 +2349,7 @@ dispel_magic = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +"ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = "Dispels Magic on One spellcaster, creature, or object; or "+20*((meta_effect.widen_spell)? 2 : 1)+"ft. radius burst";
     let saving_throw= "None";
     let spell_resist= "No";
@@ -2409,7 +2421,7 @@ fireball = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp   += 'M';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Long: "+((400*((meta_effect.enlarge_spell)? 2 : 1))+40*caster.casterlevel) +" ft";
-    let duration    = 'Instantaneous';
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = 'An '+20*((meta_effect.widen_spell)? 2 : 1)+' ft explosion of flame';
     let saving_throw= "Reflex (half)<br>(DC: [[@{spelldc3}+@{sf-evocation}]])";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -2516,7 +2528,7 @@ fireburst = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp   += 'M';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = 10*((meta_effect.widen_spell)? 2 : 1)+" ft";
-    let duration    = 'Instantaneous';
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = 'Burst of fire extending '+range+' from you';
     let saving_throw= "Reflex (half)<br>(DC: [[@{spelldc3}+@{sf-evocation}]])";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -2611,7 +2623,7 @@ haste = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+5*(Math.floor(caster.casterlevel/2))) +"ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+" rounds";
+    let duration    = duration_preset(caster, meta_effect, 1).rounds;
     let effect      = "Casts Haste on "+caster.casterlevel+" creatures, no two of which can be more than 30 ft. apart";
     let saving_throw= "Fortitude negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -2755,7 +2767,7 @@ low_light_vision = function(caster_id, target_id, meta_effect, metas, info=null)
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+" hours";
+    let duration    = duration_preset(caster, meta_effect, 1).hours;
     let effect      = "Grants low-light vision";
     let saving_throw= "Will negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -2815,7 +2827,7 @@ mage_armor = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Creature touched";
-    let duration    = 1*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours';
+    let duration    = duration_preset(caster, meta_effect, 1).hours;
     let effect      = "+4 AC";
     let saving_throw= "Will negates (harmless)";
     let spell_resist= "No";
@@ -2898,7 +2910,7 @@ magic_missile = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
-    let duration    = 'Instantaneous';
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = "Magic missiles";
     let saving_throw= "None";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -2974,7 +2986,7 @@ mass_darkvision = function(caster_id, target_id, meta_effect, metas, info=null) 
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = (10*((meta_effect.enlarge_spell)? 2 : 1))+" ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+" hours";
+    let duration    = duration_preset(caster, meta_effect, 1).hours;
     let effect      = "Grants darkvision on multiple creatures";
     let saving_throw= "Will negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -3033,7 +3045,7 @@ protection_from_arrows = function(caster_id, target_id, meta_effect, metas, info
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Creature touched";
-    let duration    = 1*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours';
+    let duration    = duration_preset(caster, meta_effect, 1).hours;
     let effect      = undefined;
     let saving_throw= "Will negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -3093,7 +3105,7 @@ swim = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
-    let duration    = 1*caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours';
+    let duration    = duration_preset(caster, meta_effect, 1).hours;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "Yes (harmless)";
@@ -3159,7 +3171,7 @@ wall_of_gloom = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
-    let duration    = 'Concentration, after Concentration is dropped: '+caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds';
+    let duration    = 'Concentration, after Concentration is dropped: '+duration_preset(caster, meta_effect, 1).rounds;
     let effect      = 'Semiopaque **sheet** of darkness up to **'+(40*((meta_effect.widen_spell)? 2 : 1))+' ft long**,\n or a **ring** of darkness with a ' +
         'radius of up to **'+(15*((meta_effect.widen_spell)? 2 : 1))+' ft**.; either form **20 ft high**';
     let saving_throw= "Will negates; see text<br>(DC: [[@{spelldc2}+@{sf-illusion}]])";
@@ -3224,7 +3236,7 @@ detect_thoughts = function(caster_id, target_id, meta_effect, metas, info=null) 
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Personal";
-    let duration    = 'Concentration, up to '+caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = 'Concentration, up to '+duration_preset(caster, meta_effect, 1).minutes;
     let effect      = 'You detect surface thoughts in up to '+((60*((meta_effect.widen_spell)? 2 : 1))+10*caster.casterlevel) +' ft';
     let saving_throw= "Will negates; see text<br>(DC: [[@{spelldc2}+@{sf-divination}]])";
     let spell_resist= "No";
@@ -3290,7 +3302,7 @@ locate_object = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Long: "+((400*((meta_effect.enlarge_spell)? 2 : 1))+40*caster.casterlevel) +" ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = 'Circle, centered on you, with a radius of '+((400*((meta_effect.enlarge_spell)? 2 : 1))+40*caster.casterlevel) +" ft";
     let saving_throw= "None";
     let spell_resist= "No";
@@ -3353,7 +3365,7 @@ see_invisibility = function(caster_id, target_id, meta_effect, metas, info=null)
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Personal";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 20 : 10)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = 'Circle, centered on you, with a radius of '+((400*((meta_effect.widen_spell)? 2 : 1))+40*caster.casterlevel) +" ft";
     let saving_throw= "None";
     let spell_resist= "No";
@@ -3414,7 +3426,7 @@ darkvision = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours';
+    let duration    = duration_preset(caster, meta_effect, 1).hours;
     let effect      = undefined;
     let saving_throw= "Will negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -3473,7 +3485,7 @@ bears_endurance = function(caster_id, target_id, meta_effect, metas, info=null) 
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = undefined;
     let saving_throw= "Will negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -3534,7 +3546,7 @@ darkness = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 20 : 10)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "No";
@@ -3596,7 +3608,7 @@ resist_energy = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 20 : 10)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = undefined;
     let saving_throw= "Fortitude negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -3670,7 +3682,7 @@ spectral_hand = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "No";
@@ -3746,7 +3758,7 @@ cats_grace = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = undefined;
     let saving_throw= "Will negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -3805,7 +3817,7 @@ rope_trick = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours';
+    let duration    = duration_preset(caster, meta_effect, 1).hours;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "No";
@@ -3874,7 +3886,7 @@ knock = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
-    let duration    = "Instantaneous";
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = "One door, box, or chest with an area of up to "+10*caster.casterlevel+"sq. ft.";
     let saving_throw= "None";
     let spell_resist= "No";
@@ -3942,7 +3954,7 @@ web = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp   += 'M';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
-    let duration    = (((meta_effect.extend_spell)? 20 : 10)*caster.casterlevel)+" minutes";
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = 'Webs in a '+((meta_effect.widen_spell)? 40 : 20)+'ft. radius spread';
     let saving_throw= "Reflex (negates)<br>(DC: [[@{spelldc2}+@{sf-conjuration}]])";
     let spell_resist= "No";
@@ -4041,7 +4053,7 @@ invisibility = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = 'Target weighting no more than '+(100*caster.casterlevel)+' lb becomes invisible';
     let saving_throw= "Will negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -4115,7 +4127,7 @@ lightning_bolt = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp   += 'M';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = ((meta_effect.enlarge_spell)? 240 : 120) +" ft line";
-    let duration    = 'Instantaneous';
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = undefined;
     let saving_throw= "Reflex (half)<br>(DC: [[@{spelldc3}+@{sf-evocation}]])";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -4223,7 +4235,7 @@ shatterfloor = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp   += 'F';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = (((meta_effect.enlarge_spell)? 200 : 100) + 10*caster.casterlevel) +" ft";
-    let duration    = 'Instantaneous';
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = 'Sonic wave with '+ ((meta_effect.widen_spell)? 30 : 15) +' ft radius';
     let saving_throw= "Reflex (half)<br>(DC: [[@{spelldc3}+@{sf-evocation}]])";
     let spell_resist= "Yes<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -4323,7 +4335,7 @@ fly = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = "Cast Fly on one touched object of up to "+(caster.casterlevel)+" cu. ft.";
     let saving_throw= "Will negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -4391,7 +4403,7 @@ shrink_item = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Touch";
-    let duration    = (((meta_effect.extend_spell)? 2 : 1)*caster.casterlevel)+" days";
+    let duration    = duration_preset(caster, meta_effect, 1).days;
     let effect      = undefined;
     let saving_throw= "Will (negates, object)<br>(DC: [[@{spelldc3}+@{sf-transmutation}]])";
     let spell_resist= "Yes (object)<br>(DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -4484,7 +4496,7 @@ protection_from_energy = function(caster_id, target_id, meta_effect, metas, info
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Creature touched";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 20 : 10)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = undefined;
     let saving_throw= "Fortitude negates (harmless)";
     let spell_resist= "Yes (harmless)";
@@ -4545,7 +4557,7 @@ vampiric_touch = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Creature touched";
-    let duration    = 'Instantaneous';
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "Yes <br> (DC: [[ 1d20+@{casterlevel}+@{spellpen} ]])";
@@ -4616,7 +4628,7 @@ polymorph = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Willing living creature touched";
-    let duration    = (((meta_effect.extend_spell)? 2 : 1) * caster.casterlevel) +" minutes";
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= "No";
@@ -4678,7 +4690,7 @@ alter_self = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Personal";
-    let duration    = (((meta_effect.extend_spell)? 20 : 10) * caster.casterlevel) +" minutes";
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = 'You assume the form of a creature of the same type as your normal form (such as humanoid or magical beast).';
     let saving_throw= "None";
     let spell_resist= "No";
@@ -4754,7 +4766,7 @@ hallucinatory_terrain = function(caster_id, target_id, meta_effect, metas, info=
 
     let cast_time   = "10 minutes";
     let range       = (((meta_effect.enlarge_spell)? 800 : 400) + 40 * caster.casterlevel) +" ft";
-    let duration    = (((meta_effect.extend_spell)? 4 : 2) * caster.casterlevel) +" hours";
+    let duration    = duration_preset(caster, meta_effect, 2).hours;
     let effect      = undefined;
     let saving_throw= "Will disbelief (if interacted with) <br> (DC: [[@{spelldc4}+@{sf-illusion}]])";
     let spell_resist= "No";
@@ -4821,7 +4833,7 @@ whispering_wind = function(caster_id, target_id, meta_effect, metas, info=null) 
     comp   += (meta_effect.still_spell)? '' : 'S,';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = ((meta_effect.widen_spell)? 2 : 1) * caster.casterlevel + " miles";
-    let duration    = ((meta_effect.extend_spell)? 2: 1) * caster.casterlevel + 'hours or until discharged ' +
+    let duration    = duration_preset(caster, meta_effect, 1).hours+' or until discharged ' +
         '(destination is reached)';
     let effect      = 'You send a message or sound on the wind to a designated area of ' + ((meta_effect.widen_spell)? 20 : 10) + 'ft';
     let saving_throw= "None";
@@ -4880,7 +4892,7 @@ wall_of_ice = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Medium: "+((100*((meta_effect.enlarge_spell)? 2 : 1))+10*caster.casterlevel) +" ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = 'Anchored plane of ice, up to one ' + ((meta_effect.widen_spell)? 20 : 10) * caster.casterlevel +
         ' ft. square, or hemisphere of ice with a radius of up to ' + (3 +  caster.casterlevel) + ' ft.';
     let saving_throw= "Reflex negates; see text<br>(DC: [[@{spelldc4}+@{sf-evocation}]])";
@@ -4961,7 +4973,7 @@ major_image = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Long: "+((400*((meta_effect.enlarge_spell)? 2 : 1))+40*caster.casterlevel) +" ft";
-    let duration    = 'Concentration +'+((meta_effect.extend_spell)? 6 : 3)+' rounds';
+    let duration    = 'Concentration +'+duration_preset(caster, meta_effect, 3).rounds;
     let effect      = 'Visual figment that cannot extend beyond four ' +
         ((meta_effect.widen_spell)? 80 : 40)+(10*caster.casterlevel)+'ft. cubes.';
     let saving_throw= "Will disbelief (if interacted with)<br>(DC: [[@{spelldc3}+@{sf-illusion}]])";
@@ -5024,7 +5036,7 @@ dark_way = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Close: "+((25*((meta_effect.enlarge_spell)? 2 : 1))+20*caster.casterlevel) +" ft";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds';
+    let duration    = duration_preset(caster, meta_effect, 1).rounds;
     let effect      = 'One bridge of force 5 ft. wide, 1 in. thick, and up to '+(caster.casterlevel*20)+' ft./level long';
     let saving_throw= "None";
     let spell_resist= spell_resist_preset.yes;
@@ -5081,7 +5093,7 @@ devils_eye = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Personal";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= spell_resist_preset.no;
@@ -5138,7 +5150,7 @@ nightshield = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = "Personal";
-    let duration    = caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes';
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = 'With a whisper-quiet whoosh, a field of shadowy energy cloaks your body.';
     let saving_throw= "None";
     let spell_resist= spell_resist_preset.no;
@@ -5203,15 +5215,6 @@ ray_of_flame = function(caster_id, target_id, meta_effect, metas, info=null) {
         long: "Long: "+((400*((meta_effect.enlarge_spell)? 2 : 1))+40*caster.casterlevel) +" ft"
     };
 
-    const duration_preset = {
-        days: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' days',
-        hours: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours',
-        minutes: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes',
-        seconds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' seconds',
-        rounds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds',
-        instantaneous: 'instantaneous'
-    };
-
     const ranged_touch_preset = {
         yes: "[[1d20 + "+caster.get_attr('bab')+'+'+caster.get_attr('dex-mod')+"]]",
         no: undefined
@@ -5228,7 +5231,7 @@ ray_of_flame = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp    += 'F';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = range_preset.close;
-    let duration    = duration_preset.instantaneous;
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = 'Ray';
     let saving_throw= "Reflex DC 15; see text";
     let spell_resist= spell_resist_preset.yes;
@@ -5295,14 +5298,6 @@ deep_breath = function(caster_id, target_id, meta_effect, metas, info=null) {
         personal: "Personal"
     };
 
-    const duration_preset = {
-        days: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' days',
-        hours: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours',
-        minutes: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes',
-        seconds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' seconds',
-        rounds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds',
-        instantaneous: 'instantaneous'
-    };
 
     const ranged_touch_preset = {
         yes: "[[1d20 + "+caster.get_attr('bab')+'+'+caster.get_attr('dex-mod')+"]]",
@@ -5319,7 +5314,7 @@ deep_breath = function(caster_id, target_id, meta_effect, metas, info=null) {
 
     let cast_time   = "1 immediate action";
     let range       = range_preset.personal;
-    let duration    = duration_preset.rounds;
+    let duration    = duration_preset(caster, meta_effect, 1).rounds;
     let effect      = undefined;
     let saving_throw= undefined;
     let spell_resist= spell_resist_preset.no;
@@ -5382,15 +5377,6 @@ scorch = function(caster_id, target_id, meta_effect, metas, info=null) {
         none: undefined
     };
 
-    const duration_preset = {
-        days: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' days',
-        hours: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours',
-        minutes: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes',
-        seconds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' seconds',
-        rounds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds',
-        instantaneous: 'instantaneous'
-    };
-
     const ranged_touch_preset = {
         yes: "[[1d20 + "+caster.get_attr('bab')+'+'+caster.get_attr('dex-mod')+"]]",
         no: undefined
@@ -5407,7 +5393,7 @@ scorch = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp    += 'F';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = range_preset.none;
-    let duration    = duration_preset.instantaneous;
+    let duration    = duration_preset(caster, meta_effect, 1).instantaneous;
     let effect      = 'Line';
     let saving_throw= "Reflex (half)<br>(DC: [[@{spelldc2}+@{sf-evocation}]])";
     let spell_resist= spell_resist_preset.yes;
@@ -5474,15 +5460,6 @@ fog_cloud = function(caster_id, target_id, meta_effect, metas, info=null) {
         none: undefined
     };
 
-    const duration_preset = {
-        days: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' days',
-        hours: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours',
-        minutes: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes',
-        seconds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' seconds',
-        rounds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds',
-        instantaneous: 'instantaneous'
-    };
-
     const ranged_touch_preset = {
         yes: "[[1d20 + "+caster.get_attr('bab')+'+'+caster.get_attr('dex-mod')+"]]",
         no: undefined
@@ -5498,7 +5475,7 @@ fog_cloud = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp    += (meta_effect.still_spell)? '' : 'S';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = range_preset.medium;
-    let duration    = 10*duration_preset.minutes;
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = 'Fog spreads in '+((meta_effect.widen_spell)? 40 : 20)+'ft. radius and high';
     let saving_throw= "None";
     let spell_resist= spell_resist_preset.no;
@@ -5561,15 +5538,6 @@ dragonskin = function(caster_id, target_id, meta_effect, metas, info=null) {
         none: undefined
     };
 
-    const duration_preset = {
-        days: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' days',
-        hours: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours',
-        minutes: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes',
-        seconds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' seconds',
-        rounds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds',
-        instantaneous: 'instantaneous'
-    };
-
     const ranged_touch_preset = {
         yes: "[[1d20 + "+caster.get_attr('bab')+'+'+caster.get_attr('dex-mod')+"]]",
         no: undefined
@@ -5585,7 +5553,7 @@ dragonskin = function(caster_id, target_id, meta_effect, metas, info=null) {
         comp    += 'M';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = range_preset.personal;
-    let duration    = 10*duration_preset.minutes;
+    let duration    = duration_preset(caster, meta_effect, 10).minutes;
     let effect      = undefined;
     let saving_throw= "None";
     let spell_resist= spell_resist_preset.no;
@@ -5655,15 +5623,6 @@ cloudkill = function(caster_id, target_id, meta_effect, metas, info=null) {
         none: undefined
     };
 
-    const duration_preset = {
-        days: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' days',
-        hours: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' hours',
-        minutes: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' minutes',
-        seconds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' seconds',
-        rounds: caster.casterlevel*((meta_effect.extend_spell)? 2 : 1)+' rounds',
-        instantaneous: 'instantaneous'
-    };
-
     const ranged_touch_preset = {
         yes: "[[1d20 + "+caster.get_attr('bab')+'+'+caster.get_attr('dex-mod')+"]]",
         no: undefined
@@ -5678,7 +5637,7 @@ cloudkill = function(caster_id, target_id, meta_effect, metas, info=null) {
     comp        += (meta_effect.still_spell)? '' : 'S';
     let cast_time   = (meta_effect.quicken_spell)? "free action" : "1 std action";
     let range       = range_preset.medium;
-    let duration    = duration_preset.minutes;
+    let duration    = duration_preset(caster, meta_effect, 1).minutes;
     let effect      = "Cloud spreads in "+((metas.widen_spell)? 40 : 20 )+"-ft. radius and high";
     let saving_throw= "Fortitude partial(see text)<br>(DC: [[@{spelldc5}+@{sf-conjuration}]])";
     let spell_resist= spell_resist_preset.no;
